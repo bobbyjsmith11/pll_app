@@ -1,0 +1,76 @@
+{{extend 'layout.html'}}
+<!DOCTYPE html>
+<form enctype="multipart/form-data"
+      action="{{URL()}}" method="post">
+
+<div class="diagram-containter" align="center" style="border: 2px solid
+black; position:relative; min-width:800px">
+  <img src="{{=URL('static','images/pll2_passive.svg')}}"
+       width="100%"
+
+  <pll_form><input type="string" class="form-control" id="fref" value="10 MHz"
+                                  style="position:absolute;top:9%;left:3%;width:100px"
+                                                                                onchange="onFrefChanged()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="fout" value="1960 MHz"
+                                  style="position:absolute;top:58%;left:87%;width:100px"
+                                                                                onchange="onFoutChanged()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="fpfd" value="50 kHz"
+                                  style="position:absolute;top:45%;left:35%;width:100px"
+                                                                                onchange="onFpfdChanged()">
+  </pll_form>
+
+  <pll_form><input type="number" class="form-control" id="divR" step="1" value=200
+                                  style="position:absolute;top:17%;left:34.5%;width:100px"
+                                                                                onchange="onRChanged()">
+  </pll_form>
+
+  <pll_form><input type="number" class="form-control" id="divN" step="1" value=39200
+                                  style="position:absolute;top:38%;left:53%;width:100px"
+                                                                                onchange="onNChanged()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="kphi" value="1 mA"
+                                  style="position:absolute;top:38%;left:3.8%;width:100px"
+                                                                                onchange="onKphiChanged()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="kvco" value="60 MHz"
+                                  style="position:absolute;top:65%;left:69%;width:100px"
+                                                                                onchange="onKvcoChanged()">
+  </pll_form>
+  <pll_form><input type="string" class="form-control" id="c1"
+                                  style="position:absolute;top:68%;left:5%;width:100px"
+                                                                                onchange="onC1Changed()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="c2"
+                                  style="position:absolute;top:63%;left:28%;width:100px"
+                                                                                onchange="onC2Changed()">
+  </pll_form>
+
+  <pll_form><input type="string" class="form-control" id="r2"
+                                  style="position:absolute;top:73%;left:28%;width:100px"
+                                                                                onchange="onR2Changed()">
+  </pll_form>
+
+  <pll_form><label for="pm"
+                   style="position:absolute;top:4%;left:69%;width:150px;">phase margin:</label>
+  <pll_form><input type="string" class="form-control" id="pm" value="49.2 deg"
+                                  style="position:absolute;top:2%;left:85%;width:100px"
+                                                                                onchange="onPmChanged()">
+  </pll_form>
+
+  <pll_form><label for="fc"
+                     style="position:absolute;top:12%;left:69%;width:150px;">loop bw:</label>
+  <pll_form><input type="string" class="form-control" id="fc" value="10 kHz"
+                                  style="position:absolute;top:10%;left:85%;width:100px"
+                                                                                onchange="onFcChanged()">
+  </pll_form>
+
+
+</div>
+{{=BEAUTIFY(request.vars)}}
