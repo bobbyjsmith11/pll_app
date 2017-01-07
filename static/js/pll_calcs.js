@@ -106,7 +106,7 @@ function calculateG( f, z ) {
 }
 
 function simulatePll( ) {
-  my_url = "/webcad_blog/pll_calcs/callSimulatePllOpenLoop.json?"
+  my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop.json?"
           + "fstart=" + 1
           + "&fstop=" + 100e6
           + "&ptsPerDec=" + 99
@@ -156,6 +156,7 @@ function testFun() {
 
 
 function setFilterType() {
+  console.log('latest and greatest');
   if ( document.getElementById("selFilterType").value == 0 ) {
     loop_filter.type = 'passive';
     loop_filter.order = 2;
@@ -412,7 +413,7 @@ function loadPll2PassiveForm() {
 
 
 function solveComponents( loop_type, gamma ) {
-  my_url = "/webcad_blog/pll_calcs/solveForComponents.json?"
+  my_url = "/pll_app/pll_calcs/solveForComponents.json?"
           + "loop_type=" + loop_type 
           + "&fc=" + pll.fc 
           + "&pm=" + pll.pm
