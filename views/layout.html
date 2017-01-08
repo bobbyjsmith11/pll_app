@@ -58,11 +58,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          {{=response.logo or ''}}
+          <!--img src="{{=URL('static','images/circuit-board-logo.jpg')}}"-->
+          <!--{{=response.logo or ''}}-->
         </div>
+        <!--div>
+          <h1 style="color:white">PLLDesign.com</h1>
+        </div-->
         <div class="collapse navbar-collapse navbar-ex1-collapse">
           <ul class="nav navbar-nav navbar-right">
-            {{='auth' in globals() and auth.navbar('Welcome',mode='dropdown') or ''}}
+            <!--{{='auth' in globals() and
+              auth.navbar('Welcome',mode='dropdown') or ''}}-->
           </ul>
           {{if response.menu:}}
           {{=MENU(response.menu, _class='nav navbar-nav',li_class='dropdown',ul_class='dropdown-menu')}}

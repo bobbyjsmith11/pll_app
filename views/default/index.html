@@ -1,9 +1,193 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=True}}
 {{extend 'layout.html'}}
 <!DOCTYPE html>
 <html lang="en">
-<html>
-  <head></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
+</head>
   <body>
-    <h1>Main Page</h1>
-  <body>
+
+
+{{block center}}
+
+<div class="container-fluid text-center">
+  
+  <h1><center>PLL Designer</h1>
+
+  <div class="diagram-container" id="pll2_passive_div" align="center" style="border: 2px solid
+    black; position:relative; min-width:800px; max-width:1000px">
+    <img src="{{=URL('static','images/pll2_passive.svg')}}"
+           width="100%">
+
+    <label for="selFilterType" id="fltTypeLabel" 
+             style="position:absolute;top:51%;left:19%;width:100px;">Filter Type:</label>
+    <select id="selFilterType" class="form-control" 
+              style="position:absolute;top:49%;left:32%;width:180px;" 
+              onchange="setFilterType()">
+      <option value="0" selected="selected">2nd Order Passive</option>
+      <option value="1">3rd Order Passive</option>
+      <option value="2">4th Order Passive</option>
+      <!--option value="3">2nd Order Active</option-->
+      <!--option value="4">3rd Order Active</option-->
+      <!--option value="5">4th Order Active</option-->
+    </select>
+    <!--button type="button" id="testBtn" class="btn btn-default
+              pull-right" style="position:absolute;top:1%;left:90%;"
+              OnClick="testFun()">test</button-->
+
+    <input type="string" class="form-control" id="fref" value="10 MHz"
+                            data-toggle="tooltip" title="reference frequency"
+                            style="position:absolute;top:9%;left:3%;width:100px"
+                                                                          onchange="onFrefChanged()">
+
+    <input type="string" class="form-control" id="fout" value="1960 MHz"
+                            data-toggle="tooltip" title="output frequency"
+                            style="position:absolute;top:58%;left:87%;width:100px"
+                                                                          onchange="onFoutChanged()">
+
+    <input type="string" class="form-control" id="fpfd" value="50 kHz"
+                            data-toggle="tooltip" title="comparison frequency"
+                            style="position:absolute;top:33%;left:25%;width:100px"
+                                                                          onchange="onFpfdChanged()">
+
+    <input type="number" class="form-control" id="divR" step="1" value=200
+                            data-toggle="tooltip" title="R divider"
+                            style="position:absolute;top:17%;left:34.5%;width:100px"
+                                                                          onchange="onRChanged()">
+
+    <input type="number" class="form-control" id="divN" step="1" value=39200
+                            data-toggle="tooltip" title="N divider"
+                            style="position:absolute;top:38%;left:53%;width:100px"
+                                                                          onchange="onNChanged()">
+
+    <input type="string" class="form-control" id="kphi" value="1 mA"
+                            data-toggle="tooltip" title="charge pump current"
+                            style="position:absolute;top:38%;left:3.8%;width:100px"
+                                                                          onchange="onKphiChanged()">
+
+    <input type="string" class="form-control" id="kvco" value="60 MHz"
+                            data-toggle="tooltip" title="tuning sensitivity (Hz/V)"
+                            style="position:absolute;top:65%;left:70%;width:100px"
+                                                                          onchange="onKvcoChanged()">
+    <input type="string" class="form-control" id="c1"
+                            style="position:absolute;top:63%;left:0%;width:110px"
+                                                                          onchange="onC1Changed()">
+
+    <input type="string" class="form-control" id="c2"
+                            style="position:absolute;top:63%;left:18%;width:110px"
+                                                                          onchange="onC2Changed()">
+
+    <input type="string" class="form-control" id="c3"
+                            style="position:absolute;top:90%;left:0%;width:110px;"
+                                                                          onchange="onC3Changed()">
+
+    <input type="string" class="form-control" id="c4"
+                            style="position:absolute;top:90%;left:0%;width:110px;"
+                                                                          onchange="onC4Changed()">
+
+    <input type="string" class="form-control" id="r2"
+                            style="position:absolute;top:73%;left:18%;width:110px"
+                                                                          onchange="onR2Changed()">
+
+    <input type="string" class="form-control" id="r3"
+                            style="position:absolute;top:90%;left:0%;width:110px;"
+                                                                          onchange="onR3Changed()">
+
+    <input type="string" class="form-control" id="r4"
+                            style="position:absolute;top:90%;left:0%;width:110px;"
+                                                                          onchange="onR4Changed()">
+
+    <label for="pm" id="pmLabel"
+             style="position:absolute;top:87%;left:72%;text-align:right;width:120px;">phase margin:</label>
+    <input type="string" class="form-control" id="pm" value="49.2 deg"
+                            style="position:absolute;top:85%;left:87%;width:100px"
+                                                                          onchange="onPmChanged()">
+
+    <label for="fc" id="fcLabel"
+               style="position:absolute;top:94%;left:77%;width:80px;text-align:right;">loop bw:</label>
+    <input type="string" class="form-control" id="fc" value="10 kHz"
+                            style="position:absolute;top:92%;left:87%;width:100px"
+                                                                          onchange="onFcChanged()">
+
+    <label for="t1" id="t1Label"
+             style="position:absolute;top:94%;left:0%;width:40px;">T1:</label>
+    <input type="string" class="form-control" id="t1"
+                                                style="position:absolute;top:92%;left:4%;width:100px"
+                                                                          onchange="onT1Changed()">
+
+    <label for="t2" id="t2Label"
+             style="position:absolute;top:94%;left:16%;width:40px;">T2:</label>
+    <input type="string" class="form-control" id="t2"
+                                                style="position:absolute;top:92%;left:20%;width:100px"
+                                                                          onchange="onT2Changed()">
+
+    <label for="t3" id="t3Label"
+             style="position:absolute;top:94%;left:32%;width:40px;">T3:</label>
+    <input type="string" class="form-control" id="t3"
+                                                style="position:absolute;top:92%;left:36%;width:100px"
+                                                                          onchange="onT3Changed()">
+
+    <label for="t4" id="t4Label"
+             style="position:absolute;top:94%;left:48%;width:40px;">T4:</label>
+    <input type="string" class="form-control" id="t4"
+                                                style="position:absolute;top:92%;left:52%;width:100px"
+                                                                          onchange="onT4Changed()">
+  </div>
+
+  <div class="diagram-container" id="pll3_passive_div" align="center" style="border: 2px solid
+    black; position:relative; min-width:800px; max-width:1000px">
+      <img src="{{=URL('static','images/pll3_passive.svg')}}"
+           width="100%">
+  </div>
+
+  <div class="diagram-container" id="pll4_passive_div" align="center" style="border: 2px solid
+    black; position:relative; min-width:800px; max-width:1000px">
+      <img src="{{=URL('static','images/pll4_passive.svg')}}"
+           width="100%">
+  </div>
+
+  <div id="pmGraph" class="svg-containter">
+  </div>
+
+
+</div>
+{{end}}
+
+{{block right_sidebar}}
+
+<div class="container-fluid text-center">
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+</div>
+
+<div class="container-fluid text-center">
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+</div>
+{{end}}
+
+{{block left_sidebar}}
+<div class="container-fluid text-center">
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+  <h3><center>ADS</h3>
+</div>
+
+<div class="container-fluid text-center">
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+  <h3><center>MORE ADS</h3>
+</div>
+{{end}}
+
+</body>
 </html>

@@ -27,6 +27,9 @@ def pll_designer():
 def blog_home():
     return {}
 
+def about_home():
+    return dict()
+
 def test_page():
     return {}
 

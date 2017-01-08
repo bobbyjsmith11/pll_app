@@ -8,6 +8,8 @@
 response.logo = A(B('web', SPAN(2), 'py'), XML('&trade;&nbsp;'),
                   _class="navbar-brand", _href="http://www.web2py.com/",
                   _id="web2py-logo")
+# response.logo = A(IMG(_src=URL('static', 'images/circuit-board-logo.jpg'),
+#                     _href=URL('default','index'))
 response.title = request.application.replace('_', ' ').title()
 response.subtitle = ''
 
@@ -48,13 +50,15 @@ def _():
     # ------------------------------------------------------------------------------------------------------------------
     # useful links to internal and external resources
     # ------------------------------------------------------------------------------------------------------------------
+    # response.menu += [
+    #     (T('Blog'), False, URL('default', 'blog_home')),
+    #     (T('Tools'), False, '#', [
+    #         (T('PLL Designer'), False, URL('default', 'pll_designer')),
+    #         (T('Test Page'), False, URL('default', 'test_page')),
+    #         (T('Display Form'), False, URL('default', 'display_form')),
+    #     ]),
     response.menu += [
-        (T('Blog'), False, URL('default', 'blog_home')),
-        (T('Tools'), False, '#', [
-            (T('PLL Designer'), False, URL('default', 'pll_designer')),
-            (T('Test Page'), False, URL('default', 'test_page')),
-            (T('Display Form'), False, URL('default', 'display_form')),
-        ]),
+        (T('About'), False, URL('default', 'about_home')),
     ]
 
 
