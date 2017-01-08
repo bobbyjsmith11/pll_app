@@ -107,6 +107,7 @@ function calculateG( f, z ) {
 
 function simulatePll( ) {
   my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop.json?"
+  // my_url = "{{URL(pll_app,pll_calcs,callSimulatePllOpenLoop)}}"
           + "fstart=" + 1
           + "&fstop=" + 100e6
           + "&ptsPerDec=" + 99
@@ -414,6 +415,7 @@ function loadPll2PassiveForm() {
 
 function solveComponents( loop_type, gamma ) {
   my_url = "/pll_app/pll_calcs/solveForComponents.json?"
+  // my_url = "{{URL(pll_app,pll_calcs,solveForComponents)}}"
           + "loop_type=" + loop_type 
           + "&fc=" + pll.fc 
           + "&pm=" + pll.pm
