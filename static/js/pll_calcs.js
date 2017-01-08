@@ -146,18 +146,14 @@ function testFun() {
   // console.log( document.getElementById("t1").style.top );
   // document.getElementById("t1").style.top = "90%";
   // console.log( document.getElementById("t1").style.top );
-  
-  // var element = document.getElementById("t1");
-  // element.outerHTML = "";
-  // delete element;
-  console.log(document.getElementById("t1").parentElement.nodeName);
-  $("#t1").detach().appendTo("#pll3_passive_div");
-  console.log(document.getElementById("t1").parentElement.nodeName);
+  simulatePll(); 
+  // console.log(document.getElementById("t1").parentElement.nodeName);
+  // $("#t1").detach().appendTo("#pll3_passive_div");
+  // console.log(document.getElementById("t1").parentElement.nodeName);
 }
 
 
 function setFilterType() {
-  console.log('latest and greatest');
   if ( document.getElementById("selFilterType").value == 0 ) {
     loop_filter.type = 'passive';
     loop_filter.order = 2;
