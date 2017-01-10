@@ -72,7 +72,7 @@ def solveForComponents( ):
                                      N,
                                      gamma=gamma )
         d = pll.calc_components()
-    return d
+    return response.json(d)
 
 class PllSecondOrderPassive( object ):
     def __init__(self,
@@ -627,7 +627,7 @@ def callSimulatePllOpenLoop():
     d = { 'freqs':f,
           'gains':g,
           'phases':p }
-    return d 
+    return response.json(d)
 
 def testSimulateOpenLoop():
     fstart = 10

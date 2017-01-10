@@ -106,28 +106,28 @@ function calculateG( f, z ) {
 }
 
 function simulatePll( ) {
-  my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop.json?"
+  my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop?"
   // my_url = "{{URL(pll_app,pll_calcs,callSimulatePllOpenLoop)}}"
-          + "fstart=" + 1
-          + "&fstop=" + 100e6
-          + "&ptsPerDec=" + 99
-          + "&kphi=" + pll.kphi
-          + "&kvco=" + pll.kvco
-          + "&N=" + pll.N
-          + "&flt_type=" + loop_filter.type
-          + "&c1=" + loop_filter.c1
-          + "&c2=" + loop_filter.c2
-          + "&r2=" + loop_filter.r2
-          + "&c3=" + loop_filter.c3 
-          + "&c4=" + loop_filter.c4 
-          + "&r3=" + loop_filter.r3 
-          + "&r4=" + loop_filter.r4;
+  dat = "fstart=" + 1
+        + "&fstop=" + 100e6
+        + "&ptsPerDec=" + 99
+        + "&kphi=" + pll.kphi
+        + "&kvco=" + pll.kvco
+        + "&N=" + pll.N
+        + "&flt_type=" + loop_filter.type
+        + "&c1=" + loop_filter.c1
+        + "&c2=" + loop_filter.c2
+        + "&r2=" + loop_filter.r2
+        + "&c3=" + loop_filter.c3 
+        + "&c4=" + loop_filter.c4 
+        + "&r3=" + loop_filter.r3 
+        + "&r4=" + loop_filter.r4;
   $.ajax( {
             type: "GET",
             url: my_url,
             datatype: 'json',
             async: true,
-            data: "{}",
+            data: dat,
             success: function (data) {
               // console.log(data)
               if (PM_PLOT_PRESENT) {
@@ -410,22 +410,21 @@ function loadPll2PassiveForm() {
 
 
 function solveComponents( loop_type, gamma ) {
-  my_url = "/pll_app/pll_calcs/solveForComponents.json?"
-  // my_url = "{{URL(pll_app,pll_calcs,solveForComponents)}}"
-          + "loop_type=" + loop_type 
-          + "&fc=" + pll.fc 
-          + "&pm=" + pll.pm
-          + "&kphi=" + pll.kphi
-          + "&kvco=" + pll.kvco
-          + "&N=" + pll.N
-          + "&gamma=" + gamma;
+  my_url = "/pll_app/pll_calcs/solveForComponents?";
+  dat = "loop_type=" + loop_type 
+        + "&fc=" + pll.fc 
+        + "&pm=" + pll.pm
+        + "&kphi=" + pll.kphi
+        + "&kvco=" + pll.kvco
+        + "&N=" + pll.N
+        + "&gamma=" + gamma;
 
   $.ajax( {
             type: "GET",
             url: my_url,
             datatype: 'json',
             async: true,
-            data: "{}",
+            data: dat,
             success: function (data) {
               RET_DATA = data
               setT1(data.t1);
