@@ -145,8 +145,7 @@ function simulatePll( ) {
 function testFun() {
   // console.log( document.getElementById("t1").style.top );
   // document.getElementById("t1").style.top = "90%";
-  // console.log( document.getElementById("t1").style.top );
-  simulatePll(); 
+  // console.log( document.getElementById("pll4_passive_div").style.width() );
   // console.log(document.getElementById("t1").parentElement.nodeName);
   // $("#t1").detach().appendTo("#pll3_passive_div");
   // console.log(document.getElementById("t1").parentElement.nodeName);
@@ -167,8 +166,11 @@ function setFilterType() {
     loop_filter.order = 4;
     loadPll4PassiveForm();
   } else if ( document.getElementById("selFilterType").value == 3 ) {
-    loop_filter.type = 'active';
-    loop_filter.order = 2;
+    loop_filter.type = 'passive';
+    loop_filter.order = 4;
+    loadPll4PassiveForm2();
+    // loop_filter.type = 'active';
+    // loop_filter.order = 2;
   } else if ( document.getElementById("selFilterType").value == 4 ) {
     loop_filter.type = 'active';
     loop_filter.order = 3;
@@ -211,6 +213,7 @@ function loadPll4PassiveForm() {
   $("#t2").detach().appendTo(mydiv);
   $("#t2Label").detach().appendTo(mydiv);
 
+  $("#testBtn").detach().appendTo(mydiv);
 
   $("#c1").detach().appendTo(mydiv);
   document.getElementById("c1").style.display = "block";
