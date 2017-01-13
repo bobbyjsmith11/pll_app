@@ -18,15 +18,55 @@
   <div class="diagram-container" id="pll_blk_diag_div">
     <img src="{{=URL('static','images/pll_blk_diag.svg')}}"
            width="100%">
+
+    <button type="button" id="testBtn" class="btn btn-default
+              pull-right" style="position:absolute;top:1%;left:90%;"
+              OnClick="testFun()">test</button>
+
+    <input type="string" class="form-control input-sm pll-form-input" id="fref" value="10 MHz"
+                            data-toggle="tooltip" title="reference frequency"
+                            style="position:absolute;top:62%;left:0.5%;"
+                                                                          onchange="onFrefChanged()">
+
+    <input type="string" class="form-control input-sm pll-form-input" id="fout" value="1960 MHz"
+                            data-toggle="tooltip" title="output frequency"
+                            style="position:absolute;top:45%;left:86.5%;"
+                                                                          onchange="onFoutChanged()">
+
+    <input type="string" class="form-control input-sm pll-form-input" id="fpfd" value="50 kHz"
+                            data-toggle="tooltip" title="comparison frequency"
+                            style="position:absolute;top:28%;left:26.75%;"
+                                                                          onchange="onFpfdChanged()">
+
+    <input type="number" class="form-control input-sm pll-form-input" id="divR" step="1" value=200
+                            data-toggle="tooltip" title="R divider"
+                            style="position:absolute;top:28%;left:13%;"
+                                                                          onchange="onRChanged()">
+
+    <input type="number" class="form-control input-sm pll-form-input" id="divN" step="1" value=39200
+                            data-toggle="tooltip" title="N divider"
+                            style="position:absolute;top:79%;left:26.75%;"
+                                                                          onchange="onNChanged()">
+    
+    <input type="string" class="form-control input-sm pll-form-input" id="kphi" value="1 mA"
+                            data-toggle="tooltip" title="charge pump current"
+                            style="position:absolute;top:28%;left:40.5%;"
+                                                                          onchange="onKphiChanged()">
+
+    <input type="string" class="form-control input-sm pll-form-input" id="kvco" value="60 MHz"
+                            data-toggle="tooltip" title="tuning sensitivity (Hz/V)"
+                            style="position:absolute;top:28%;left:68.75%;"
+                                                                          onchange="onKvcoChanged()">
+
   </div>
   <div class="diagram-container" id="pll2_passive_div">
     <img src="{{=URL('static','images/pll2_passive.svg')}}"
            width="100%">
 
     <label for="selFilterType" id="fltTypeLabel" 
-             style="position:absolute;top:51%;left:19%;width:100px;">Filter Type:</label>
-    <select id="selFilterType" class="form-control input-sm" 
-              style="position:absolute;top:49%;left:32%;width:150px;" 
+             style="position:absolute;top:1%;left:55%;width:100px;">Filter Type:</label>
+    <select id="selFilterType" class="form-control input-sm pll-form-input" 
+              style="position:absolute;top:49%;left:75%;width:180px;" 
               onchange="setFilterType()">
       <option value="0">2nd Order Passive</option>
       <option value="1">3rd Order Passive</option>
@@ -35,81 +75,42 @@
       <!--option value="4">3rd Order Active</option-->
       <!--option value="5">4th Order Active</option-->
     </select>
-    <button type="button" id="testBtn" class="btn btn-default
-              pull-right" style="position:absolute;top:1%;left:90%;"
-              OnClick="testFun()">test</button>
-    
-
-    <input type="string" class="form-control input-sm pll-form-input" id="fref" value="10 MHz"
-                            data-toggle="tooltip" title="reference frequency"
-                            style="position:absolute;top:9%;left:3%;"
-                                                                          onchange="onFrefChanged()">
-
-    <input type="string" class="form-control input-sm pll-form-input" id="fout" value="1960 MHz"
-                            data-toggle="tooltip" title="output frequency"
-                            style="position:absolute;top:58%;left:87%;"
-                                                                          onchange="onFoutChanged()">
-
-    <input type="string" class="form-control input-sm pll-form-input" id="fpfd" value="50 kHz"
-                            data-toggle="tooltip" title="comparison frequency"
-                            style="position:absolute;top:33%;left:25%;"
-                                                                          onchange="onFpfdChanged()">
-
-    <input type="number" class="form-control input-sm pll-form-input" id="divR" step="1" value=200
-                            data-toggle="tooltip" title="R divider"
-                            style="position:absolute;top:17%;left:34.5%;"
-                                                                          onchange="onRChanged()">
-
-    <input type="number" class="form-control input-sm pll-form-input" id="divN" step="1" value=39200
-                            data-toggle="tooltip" title="N divider"
-                            style="position:absolute;top:38%;left:53%;"
-                                                                          onchange="onNChanged()">
-
-    <input type="string" class="form-control input-sm pll-form-input" id="kphi" value="1 mA"
-                            data-toggle="tooltip" title="charge pump current"
-                            style="position:absolute;top:38%;left:3.8%;"
-                                                                          onchange="onKphiChanged()">
-
-    <input type="string" class="form-control input-sm pll-form-input" id="kvco" value="60 MHz"
-                            data-toggle="tooltip" title="tuning sensitivity (Hz/V)"
-                            style="position:absolute;top:65%;left:70%;"
-                                                                          onchange="onKvcoChanged()">
-    <input type="string" class="form-control input-sm pll-form-input" id="c1"
+    <input type="string" class="form-control input-sm pll-component-input" id="c1"
                             style="position:absolute;top:63%;left:0%;"
                                                                           onchange="onC1Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="c2"
+    <input type="string" class="form-control input-sm pll-component-input" id="c2"
                             style="position:absolute;top:63%;left:18%;"
                                                                           onchange="onC2Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="c3"
+    <input type="string" class="form-control input-sm pll-component-input" id="c3"
                             style="position:absolute;top:90%;left:0%;"
                                                                           onchange="onC3Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="c4"
+    <input type="string" class="form-control input-sm pll-component-input" id="c4"
                             style="position:absolute;top:90%;left:0%;"
                                                                           onchange="onC4Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="r2"
+    <input type="string" class="form-control input-sm pll-component-input" id="r2"
                             style="position:absolute;top:73%;left:18%;"
                                                                           onchange="onR2Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="r3"
+    <input type="string" class="form-control input-sm pll-component-input" id="r3"
                             style="position:absolute;top:90%;left:0%;"
                                                                           onchange="onR3Changed()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="r4"
+    <input type="string" class="form-control input-sm pll-component-input" id="r4"
                             style="position:absolute;top:90%;left:0%;"
                                                                           onchange="onR4Changed()">
 
     <label for="pm" id="pmLabel"
-             style="position:absolute;top:87%;left:72%;text-align:right;width:120px;">phase margin:</label>
+             style="position:absolute;top:87%;left:72%;text-align:right;width:100px">phase margin:</label>
     <input type="string" class="form-control input-sm pll-form-input" id="pm" value="49.2 deg"
                             style="position:absolute;top:85%;left:87%;"
                                                                           onchange="onPmChanged()">
 
     <label for="fc" id="fcLabel"
-               style="position:absolute;top:94%;left:77%;width:80px;text-align:right;">loop bw:</label>
+               style="position:absolute;top:94%;left:77%;width:100px;text-align:right;">loop bw:</label>
     <input type="string" class="form-control input-sm pll-form-input" id="fc" value="10 kHz"
                             style="position:absolute;top:92%;left:87%;"
                                                                           onchange="onFcChanged()">
@@ -135,7 +136,7 @@
     <label for="t4" id="t4Label"
              style="position:absolute;top:94%;left:48%;width:40px;">T4:</label>
     <input type="string" class="form-control input-sm pll-form-input" id="t4"
-                                                style="position:absolute;top:92%;left:52%;width:100px"
+                                                style="position:absolute;top:92%;left:52%;"
                                                                           onchange="onT4Changed()">
   </div>
 

@@ -616,7 +616,7 @@ def callSimulatePllOpenLoop():
             'flt_type':flt_type
             }
     # d = flt 
-    f, g, p = simulatePllOpenLoop( fstart,
+    f, g, p, fz, pz = simulatePllOpenLoop( fstart,
                                    fstop,
                                    ptsPerDec,
                                    kphi,
@@ -626,7 +626,10 @@ def callSimulatePllOpenLoop():
     
     d = { 'freqs':f,
           'gains':g,
-          'phases':p }
+          'phases':p,
+          'fzero': fz,
+          'pzero': pz,
+        }
     return response.json(d)
 
 def testSimulateOpenLoop():
@@ -637,23 +640,54 @@ def testSimulateOpenLoop():
     kvco = 60e6
     N = 39200
     flt = {
-            'c1':145e-12,
-            'c2':0.906e-9,
-            'c3':5.19e-12,
-            'c4':0,
-            'r2':47775,
-            'r3':578e3,
-            'r4':0,
+            'c1':52.4e-12,
+            'c2':1.03e-9,
+            'c3':10.9e-12,
+            'c4':6.34e-12,
+            'r2':47.8e3,
+            'r3':111e3,
+            'r4':279e3,
             'flt_type':"passive" 
            }
-    f,g,p = simulatePllOpenLoop( fstart, 
+    f,g,p,fz,pz = simulatePllOpenLoop( fstart, 
                          fstop, 
                          ptsPerDec,
                          kphi,
                          kvco,
                          N,
                          filt=flt)
-    return f,g,p
+
+    return f, g, p, fz, pz
+
+def getInterpolatedFzeroPzer( f, g, p ):
+    """ look at the points of f, g and p surrounding where
+    g crosses zero and interpolate f and p at 0
+    """
+    ndx = getIndexZeroDbCrossover( g )
+    f_zero_db = None 
+    g_zero_db = None 
+    p_zero_db = None 
+    if ndx != None:
+        f_zero_db = f[ndx]
+        g_zero_db = g[ndx]
+        p_zero_db = p[ndx]
+    
+    newf = f[ndx-1:ndx+1]
+    newp = p[ndx-1:ndx+1]
+    newg = g[ndx-1:ndx+1]
+    mg = (newg[1] - newg[0])/(newf[1] - newf[0])
+    mp = (newp[1] - newp[0])/(newf[1] - newf[0])
+    
+    fz = newf[0] - (newg[0]/mg)
+    deltaf = fz - newf[0]   # distance from newf[0] to 0db crossover
+    pz = mp*deltaf + newp[0]
+    return fz, pz
+
+def getIndexZeroDbCrossover( g ):
+    for i in range(len(g)):
+        if g[i] <= 0:
+            return i
+    return None
 
 def simulatePllOpenLoop( fstart, 
                          fstop, 
@@ -723,7 +757,8 @@ def simulatePllOpenLoop( fstart,
     p = []
     g.extend(g_ol_db)
     p.extend(ph_ol)
-    return f, g, p
+    fz, pz = getInterpolatedFzeroPzer( f, g, p )
+    return f, g, p, fz, pz
 
 def calculateCoefficients( c1=0, 
                            c2=0, 

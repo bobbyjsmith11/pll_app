@@ -132,6 +132,10 @@ function simulatePll( ) {
               // console.log(data)
               if (PM_PLOT_PRESENT) {
                 updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
+                setPm(data.pzero);
+                setFc(data.fzero); 
+                // console.log("fzero = " + data.fzero);
+                // console.log("pzero = " + data.pzero);
               } else {
                 plotGainPhaseMargin( data.gains , data.phases, data.freqs );
                 PM_PLOT_PRESENT = true;  
@@ -195,99 +199,97 @@ function loadPll4PassiveForm() {
 
   var mydiv = "#pll4_passive_div";
 
-  // $("#fltTypeLabel").detach().appendTo(mydiv);
-  // $("#fout").detach().appendTo(mydiv);
-  // $("#kvco").detach().appendTo(mydiv);
-  $("#fc").detach().appendTo(mydiv);
+  $("#fltTypeLabel").detach().appendTo(mydiv);
+
+ 
   $("#fcLabel").detach().appendTo(mydiv);
-  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("fcLabel").style.display = "block";
+  document.getElementById("fcLabel").style.top = "17%";
+  document.getElementById("fcLabel").style.left = "0%";
+
+  $("#fc").detach().appendTo(mydiv);
+  document.getElementById("fc").style.display = "block";
+  document.getElementById("fc").style.top = "16%";
+  document.getElementById("fc").style.left = "18%";
+
   $("#pmLabel").detach().appendTo(mydiv);
-  $("#t1").detach().appendTo(mydiv);
-  $("#t1Label").detach().appendTo(mydiv);
-  $("#t2").detach().appendTo(mydiv);
-  $("#t2Label").detach().appendTo(mydiv);
+  document.getElementById("pmLabel").style.display = "block";
+  document.getElementById("pmLabel").style.top = "1%";
+  document.getElementById("pmLabel").style.left = "0%";
 
-  // $("#testBtn").detach().appendTo(mydiv);
-  
-  // $("#fref").detach().appendTo(mydiv);
-  // document.getElementById("fref").style.display = "block";
-  // document.getElementById("fref").style.top = "0%";
-  // document.getElementById("fref").style.left = "0%";
-
-  // $("#divN").detach().appendTo(mydiv);
-  // document.getElementById("divN").style.display = "block";
-  // document.getElementById("divN").style.top = "20%";
-  // document.getElementById("divN").style.left = "48%";
-
-  // $("#fpfd").detach().appendTo(mydiv);
-  // document.getElementById("fpfd").style.display = "block";
-  // document.getElementById("fpfd").style.top = "26%";
-  // document.getElementById("fpfd").style.left = "2%";
-  // 
-  // $("#divR").detach().appendTo(mydiv);
-  // document.getElementById("divR").style.display = "block";
-  // document.getElementById("divR").style.top = "0%";
-  // document.getElementById("divR").style.left = "15%";
-  // document.getElementById("divR").style.width = "60px";
-  
-  // $("#kphi").detach().appendTo(mydiv);
-  // document.getElementById("kphi").style.display = "block";
-  // document.getElementById("kphi").style.top = "45%";
-  // document.getElementById("kphi").style.left = "2%";
-
+  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("pm").style.display = "block";
+  document.getElementById("pm").style.top = "0%";
+  document.getElementById("pm").style.left = "18%";
 
   $("#selFilterType").detach().appendTo(mydiv);
   document.getElementById("selFilterType").style.display = "block";
   document.getElementById("selFilterType").style.top = "0%";
-  document.getElementById("selFilterType").style.left = "50%";
+  document.getElementById("selFilterType").style.left = "70%";
 
-
+  // 1st 
   $("#c1").detach().appendTo(mydiv);
   document.getElementById("c1").style.display = "block";
-  document.getElementById("c1").style.top = "69%";
-  document.getElementById("c1").style.left = "0%";
+  document.getElementById("c1").style.top = "54%";
+  document.getElementById("c1").style.left = "9.5%";
 
+  $("#t1Label").detach().appendTo(mydiv);
+  document.getElementById("t1Label").style.display = "none";
+
+  $("#t1").detach().appendTo(mydiv);
+  document.getElementById("t1").style.display = "none";
+
+  // 2nd
   $("#r2").detach().appendTo(mydiv);
   document.getElementById("r2").style.display = "block";
-  document.getElementById("r2").style.top = "80%";
-  document.getElementById("r2").style.left = "17%";
+  document.getElementById("r2").style.top = "68%";
+  document.getElementById("r2").style.left = "33%";
 
   $("#c2").detach().appendTo(mydiv);
   document.getElementById("c2").style.display = "block";
-  document.getElementById("c2").style.top = "69%";
-  document.getElementById("c2").style.left = "17%";
+  document.getElementById("c2").style.top = "48%";
+  document.getElementById("c2").style.left = "33%";
 
+  $("#t2Label").detach().appendTo(mydiv);
+  document.getElementById("t2Label").style.display = "none";
+
+  $("#t2").detach().appendTo(mydiv);
+  document.getElementById("t2").style.display = "none";
+
+  // 3rd
   $("#r3").detach().appendTo(mydiv);
   document.getElementById("r3").style.display = "block";
-  document.getElementById("r3").style.top = "63%";
-  document.getElementById("r3").style.left = "34%";
+  document.getElementById("r3").style.top = "25%";
+  document.getElementById("r3").style.left = "43%";
 
   $("#c3").detach().appendTo(mydiv);
   document.getElementById("c3").style.display = "block";
-  document.getElementById("c3").style.top = "79%";
-  document.getElementById("c3").style.left = "34%";
+  document.getElementById("c3").style.top = "54%";
+  document.getElementById("c3").style.left = "60%";
 
+  $("#t3Label").detach().appendTo(mydiv);
+  document.getElementById("t3Label").style.display = "none";
+
+  $("#t3").detach().appendTo(mydiv);
+  document.getElementById("t3").style.display = "none";
+
+  // 4th
   $("#r4").detach().appendTo(mydiv);
   document.getElementById("r4").style.display = "block";
-  document.getElementById("r4").style.top = "63%";
-  document.getElementById("r4").style.left = "51%";
+  document.getElementById("r4").style.top = "25%";
+  document.getElementById("r4").style.left = "68%";
 
   $("#c4").detach().appendTo(mydiv);
   document.getElementById("c4").style.display = "block";
-  document.getElementById("c4").style.top = "79%";
-  document.getElementById("c4").style.left = "51%";
-
-  $("#t3").detach().appendTo(mydiv);
-  document.getElementById("t3").style.display = "block";
-
-  $("#t3Label").detach().appendTo(mydiv);
-  document.getElementById("t3Label").style.display = "block";
-
-  $("#t4").detach().appendTo(mydiv);
-  document.getElementById("t4").style.display = "block";
+  document.getElementById("c4").style.top = "54%";
+  document.getElementById("c4").style.left = "85%";
 
   $("#t4Label").detach().appendTo(mydiv);
-  document.getElementById("t4Label").style.display = "block";
+  document.getElementById("t4Label").style.display = "none";
+
+  $("#t4").detach().appendTo(mydiv);
+  document.getElementById("t4").style.display = "none";
+
 }
 
 /* move all of the form inputs to the appropriate div
@@ -302,67 +304,93 @@ function loadPll3PassiveForm() {
   var mydiv = "#pll3_passive_div";
 
   $("#fltTypeLabel").detach().appendTo(mydiv);
-  $("#selFilterType").detach().appendTo(mydiv);
-  $("#fpfd").detach().appendTo(mydiv);
-  $("#fref").detach().appendTo(mydiv);
-  $("#fout").detach().appendTo(mydiv);
-  $("#kphi").detach().appendTo(mydiv);
-  $("#kvco").detach().appendTo(mydiv);
-  $("#divR").detach().appendTo(mydiv);
-  $("#divN").detach().appendTo(mydiv);
-  $("#fc").detach().appendTo(mydiv);
+
+ 
   $("#fcLabel").detach().appendTo(mydiv);
-  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("fcLabel").style.display = "block";
+  document.getElementById("fcLabel").style.top = "17%";
+  document.getElementById("fcLabel").style.left = "0%";
+
+  $("#fc").detach().appendTo(mydiv);
+  document.getElementById("fc").style.display = "block";
+  document.getElementById("fc").style.top = "16%";
+  document.getElementById("fc").style.left = "18%";
+
   $("#pmLabel").detach().appendTo(mydiv);
-  $("#t1").detach().appendTo(mydiv);
-  $("#t1Label").detach().appendTo(mydiv);
-  $("#t2").detach().appendTo(mydiv);
-  $("#t2Label").detach().appendTo(mydiv);
+  document.getElementById("pmLabel").style.display = "block";
+  document.getElementById("pmLabel").style.top = "1%";
+  document.getElementById("pmLabel").style.left = "0%";
+
+  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("pm").style.display = "block";
+  document.getElementById("pm").style.top = "0%";
+  document.getElementById("pm").style.left = "18%";
 
 
+  $("#selFilterType").detach().appendTo(mydiv);
+  document.getElementById("selFilterType").style.display = "block";
+  document.getElementById("selFilterType").style.top = "0%";
+  document.getElementById("selFilterType").style.left = "70%";
+
+  // 1st 
   $("#c1").detach().appendTo(mydiv);
   document.getElementById("c1").style.display = "block";
-  document.getElementById("c1").style.top = "69%";
-  document.getElementById("c1").style.left = "0%";
+  document.getElementById("c1").style.top = "54%";
+  document.getElementById("c1").style.left = "9.5%";
 
+  $("#t1Label").detach().appendTo(mydiv);
+  document.getElementById("t1Label").style.display = "none";
+
+  $("#t1").detach().appendTo(mydiv);
+  document.getElementById("t1").style.display = "none";
+
+  // 2nd
   $("#r2").detach().appendTo(mydiv);
   document.getElementById("r2").style.display = "block";
-  document.getElementById("r2").style.top = "80%";
-  document.getElementById("r2").style.left = "17%";
+  document.getElementById("r2").style.top = "68%";
+  document.getElementById("r2").style.left = "33%";
 
   $("#c2").detach().appendTo(mydiv);
   document.getElementById("c2").style.display = "block";
-  document.getElementById("c2").style.top = "69%";
-  document.getElementById("c2").style.left = "17%";
+  document.getElementById("c2").style.top = "48%";
+  document.getElementById("c2").style.left = "33%";
 
+  $("#t2Label").detach().appendTo(mydiv);
+  document.getElementById("t2Label").style.display = "none";
+
+  $("#t2").detach().appendTo(mydiv);
+  document.getElementById("t2").style.display = "none";
+
+  // 3rd
   $("#r3").detach().appendTo(mydiv);
   document.getElementById("r3").style.display = "block";
-  document.getElementById("r3").style.top = "63%";
-  document.getElementById("r3").style.left = "34%";
+  document.getElementById("r3").style.top = "25%";
+  document.getElementById("r3").style.left = "43%";
 
   $("#c3").detach().appendTo(mydiv);
   document.getElementById("c3").style.display = "block";
-  document.getElementById("c3").style.top = "79%";
-  document.getElementById("c3").style.left = "34%";
+  document.getElementById("c3").style.top = "54%";
+  document.getElementById("c3").style.left = "60%";
 
+  $("#t3Label").detach().appendTo(mydiv);
+  document.getElementById("t3Label").style.display = "none";
+
+  $("#t3").detach().appendTo(mydiv);
+  document.getElementById("t3").style.display = "none";
+
+  // 4th
   $("#r4").detach().appendTo(mydiv);
   document.getElementById("r4").style.display = "none";
 
   $("#c4").detach().appendTo(mydiv);
   document.getElementById("c4").style.display = "none";
 
-
-  $("#t3").detach().appendTo(mydiv);
-  document.getElementById("t3").style.display = "block";
-
-  $("#t3Label").detach().appendTo(mydiv);
-  document.getElementById("t3Label").style.display = "block";
+  $("#t4Label").detach().appendTo(mydiv);
+  document.getElementById("t4Label").style.display = "none";
 
   $("#t4").detach().appendTo(mydiv);
   document.getElementById("t4").style.display = "none";
 
-  $("#t4Label").detach().appendTo(mydiv);
-  document.getElementById("t4Label").style.display = "none";
 }
 
 
@@ -379,63 +407,90 @@ function loadPll2PassiveForm() {
   var mydiv = "#pll2_passive_div";
 
   $("#fltTypeLabel").detach().appendTo(mydiv);
-  $("#selFilterType").detach().appendTo(mydiv);
-  $("#fpfd").detach().appendTo(mydiv);
-  $("#fref").detach().appendTo(mydiv);
-  $("#fout").detach().appendTo(mydiv);
-  $("#kphi").detach().appendTo(mydiv);
-  $("#kvco").detach().appendTo(mydiv);
-  $("#divR").detach().appendTo(mydiv);
-  $("#divN").detach().appendTo(mydiv);
-  $("#fc").detach().appendTo(mydiv);
+
+ 
   $("#fcLabel").detach().appendTo(mydiv);
-  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("fcLabel").style.display = "block";
+  document.getElementById("fcLabel").style.top = "17%";
+  document.getElementById("fcLabel").style.left = "0%";
+
+  $("#fc").detach().appendTo(mydiv);
+  document.getElementById("fc").style.display = "block";
+  document.getElementById("fc").style.top = "16%";
+  document.getElementById("fc").style.left = "18%";
+
   $("#pmLabel").detach().appendTo(mydiv);
+  document.getElementById("pmLabel").style.display = "block";
+  document.getElementById("pmLabel").style.top = "1%";
+  document.getElementById("pmLabel").style.left = "0%";
+
+  $("#pm").detach().appendTo(mydiv);
+  document.getElementById("pm").style.display = "block";
+  document.getElementById("pm").style.top = "0%";
+  document.getElementById("pm").style.left = "18%";
+
+
+  $("#selFilterType").detach().appendTo(mydiv);
+  document.getElementById("selFilterType").style.display = "block";
+  document.getElementById("selFilterType").style.top = "0%";
+  document.getElementById("selFilterType").style.left = "70%";
+
+
+  // 1st 
   $("#c1").detach().appendTo(mydiv);
-  $("#t1").detach().appendTo(mydiv);
-  $("#t1Label").detach().appendTo(mydiv);
-  $("#t2").detach().appendTo(mydiv);
-  $("#t2Label").detach().appendTo(mydiv);
-
-
-
   document.getElementById("c1").style.display = "block";
-  document.getElementById("c1").style.top = "69%";
-  document.getElementById("c1").style.left = "0%";
+  document.getElementById("c1").style.top = "54%";
+  document.getElementById("c1").style.left = "9.5%";
 
+  $("#t1Label").detach().appendTo(mydiv);
+  document.getElementById("t1Label").style.display = "none";
+
+  $("#t1").detach().appendTo(mydiv);
+  document.getElementById("t1").style.display = "none";
+
+  // 2nd
   $("#r2").detach().appendTo(mydiv);
   document.getElementById("r2").style.display = "block";
-  document.getElementById("r2").style.top = "80%";
-  document.getElementById("r2").style.left = "17%";
+  document.getElementById("r2").style.top = "68%";
+  document.getElementById("r2").style.left = "33%";
 
   $("#c2").detach().appendTo(mydiv);
   document.getElementById("c2").style.display = "block";
-  document.getElementById("c2").style.top = "69%";
-  document.getElementById("c2").style.left = "17%";
+  document.getElementById("c2").style.top = "48%";
+  document.getElementById("c2").style.left = "33%";
 
+  $("#t2Label").detach().appendTo(mydiv);
+  document.getElementById("t2Label").style.display = "none";
+
+  $("#t2").detach().appendTo(mydiv);
+  document.getElementById("t2").style.display = "none";
+
+  // 3rd
   $("#r3").detach().appendTo(mydiv);
   document.getElementById("r3").style.display = "none";
 
   $("#c3").detach().appendTo(mydiv);
   document.getElementById("c3").style.display = "none";
 
+  $("#t3Label").detach().appendTo(mydiv);
+  document.getElementById("t3Label").style.display = "none";
+
+  $("#t3").detach().appendTo(mydiv);
+  document.getElementById("t3").style.display = "none";
+
+  // 4th
   $("#r4").detach().appendTo(mydiv);
   document.getElementById("r4").style.display = "none";
 
   $("#c4").detach().appendTo(mydiv);
   document.getElementById("c4").style.display = "none";
 
-  $("#t3").detach().appendTo(mydiv);
-  document.getElementById("t3").style.display = "none";
-
-  $("#t3Label").detach().appendTo(mydiv);
-  document.getElementById("t3Label").style.display = "none";
+  $("#t4Label").detach().appendTo(mydiv);
+  document.getElementById("t4Label").style.display = "none";
 
   $("#t4").detach().appendTo(mydiv);
   document.getElementById("t4").style.display = "none";
 
-  $("#t4Label").detach().appendTo(mydiv);
-  document.getElementById("t4Label").style.display = "none";
 }
 
 
@@ -515,7 +570,8 @@ function get_current_multiplier(idElement) {
  */
 function setFc(val) {
   pll.fc = val;
-  document.getElementById("fc").value = math.unit(pll.fc,"Hz").toString();
+  document.getElementById("fc").value = math.unit(pll.fc,"Hz").format(3);
+  
 }
 
 
@@ -546,7 +602,7 @@ function setKvco(val) {
  */
 function setPm(val) {
   pll.pm = val;
-  document.getElementById("pm").value = math.unit(pll.pm,"deg").toString();
+  document.getElementById("pm").value = math.unit(pll.pm,"deg").format(3);
 }
 
 
@@ -697,6 +753,7 @@ function onC1Changed() {
     return;
   }
 
+  simulatePll();
 }
 
 /* User changes C2. Resimulate loop.
@@ -712,6 +769,7 @@ function onC2Changed() {
     return;
   }
 
+  simulatePll();
 }
 
 /* User changes C3. Resimulate loop.
@@ -726,6 +784,8 @@ function onC3Changed() {
     document.getElementById("c3").value = math.unit(loop_filter.c3,"F").format(3);
     return;
   }
+
+  simulatePll();
 
 }
 
@@ -742,6 +802,8 @@ function onC4Changed() {
     return;
   }
 
+  simulatePll();
+
 }
 
 /* User changes R2. Resimulate loop.
@@ -756,6 +818,8 @@ function onR2Changed() {
     document.getElementById("r2").value = math.unit(loop_filter.r2,"ohm").format(3);
     return;
   }
+
+  simulatePll();
 
 }
 
@@ -772,6 +836,8 @@ function onR3Changed() {
     return;
   }
 
+  simulatePll();
+
 }
 
 /* User changes R4. Resimulate loop.
@@ -786,6 +852,8 @@ function onR4Changed() {
     document.getElementById("r4").value = math.unit(loop_filter.r4,"ohm").format(3);
     return;
   }
+
+  simulatePll();
 
 }
 
