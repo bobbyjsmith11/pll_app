@@ -15,6 +15,10 @@
 
 <div class="container-fluid text-center">
   
+  <div class="diagram-container" id="pll_blk_diag_div">
+    <img src="{{=URL('static','images/pll_blk_diag.svg')}}"
+           width="100%">
+  </div>
   <div class="diagram-container" id="pll2_passive_div">
     <img src="{{=URL('static','images/pll2_passive.svg')}}"
            width="100%">
@@ -34,6 +38,7 @@
     <button type="button" id="testBtn" class="btn btn-default
               pull-right" style="position:absolute;top:1%;left:90%;"
               OnClick="testFun()">test</button>
+    
 
     <input type="string" class="form-control input-sm pll-form-input" id="fref" value="10 MHz"
                             data-toggle="tooltip" title="reference frequency"

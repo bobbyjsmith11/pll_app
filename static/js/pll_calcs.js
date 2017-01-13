@@ -145,7 +145,7 @@ function simulatePll( ) {
 function testFun() {
   // console.log( document.getElementById("t1").style.top );
   // document.getElementById("t1").style.top = "90%";
-  // console.log( document.getElementById("pll4_passive_div").style.width() );
+  console.log( $("#pll4_passive_div").width() );
   // console.log(document.getElementById("t1").parentElement.nodeName);
   // $("#t1").detach().appendTo("#pll3_passive_div");
   // console.log(document.getElementById("t1").parentElement.nodeName);
@@ -195,15 +195,9 @@ function loadPll4PassiveForm() {
 
   var mydiv = "#pll4_passive_div";
 
-  $("#fltTypeLabel").detach().appendTo(mydiv);
-  $("#selFilterType").detach().appendTo(mydiv);
-  $("#fpfd").detach().appendTo(mydiv);
-  $("#fref").detach().appendTo(mydiv);
-  $("#fout").detach().appendTo(mydiv);
-  $("#kphi").detach().appendTo(mydiv);
-  $("#kvco").detach().appendTo(mydiv);
-  $("#divR").detach().appendTo(mydiv);
-  $("#divN").detach().appendTo(mydiv);
+  // $("#fltTypeLabel").detach().appendTo(mydiv);
+  // $("#fout").detach().appendTo(mydiv);
+  // $("#kvco").detach().appendTo(mydiv);
   $("#fc").detach().appendTo(mydiv);
   $("#fcLabel").detach().appendTo(mydiv);
   $("#pm").detach().appendTo(mydiv);
@@ -213,7 +207,40 @@ function loadPll4PassiveForm() {
   $("#t2").detach().appendTo(mydiv);
   $("#t2Label").detach().appendTo(mydiv);
 
-  $("#testBtn").detach().appendTo(mydiv);
+  // $("#testBtn").detach().appendTo(mydiv);
+  
+  // $("#fref").detach().appendTo(mydiv);
+  // document.getElementById("fref").style.display = "block";
+  // document.getElementById("fref").style.top = "0%";
+  // document.getElementById("fref").style.left = "0%";
+
+  // $("#divN").detach().appendTo(mydiv);
+  // document.getElementById("divN").style.display = "block";
+  // document.getElementById("divN").style.top = "20%";
+  // document.getElementById("divN").style.left = "48%";
+
+  // $("#fpfd").detach().appendTo(mydiv);
+  // document.getElementById("fpfd").style.display = "block";
+  // document.getElementById("fpfd").style.top = "26%";
+  // document.getElementById("fpfd").style.left = "2%";
+  // 
+  // $("#divR").detach().appendTo(mydiv);
+  // document.getElementById("divR").style.display = "block";
+  // document.getElementById("divR").style.top = "0%";
+  // document.getElementById("divR").style.left = "15%";
+  // document.getElementById("divR").style.width = "60px";
+  
+  // $("#kphi").detach().appendTo(mydiv);
+  // document.getElementById("kphi").style.display = "block";
+  // document.getElementById("kphi").style.top = "45%";
+  // document.getElementById("kphi").style.left = "2%";
+
+
+  $("#selFilterType").detach().appendTo(mydiv);
+  document.getElementById("selFilterType").style.display = "block";
+  document.getElementById("selFilterType").style.top = "0%";
+  document.getElementById("selFilterType").style.left = "50%";
+
 
   $("#c1").detach().appendTo(mydiv);
   document.getElementById("c1").style.display = "block";
