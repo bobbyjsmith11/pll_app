@@ -1,24 +1,66 @@
 @charset "UTF-8";
 
-
 .pll-form-input {
   width: 80px;
-  background:#00FF00;
+  /* background:#00FF00; */
   border:2px solid black;
 }
-
 
 .pll-component-input {
   width: 90px;
-  background:#C0C0C0;
+  /* background:#C0C0C0; */
   border:2px solid black;
 }
+
 .diagram-container {
   width: 100%;
   position:relative;
-  /*background-color:#2ec771;*/
+  vertical-align: middle;
+  display: inline-block;
+  margin: 10px; 
+  /* background-color:#2ec771;*/
   border:2px solid black;
   min-width: 550px;
   max-width: 700px; 
 }
+
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  /*padding-bottom: 100%;*/
+  vertical-align: middle;
+  overflow: hidden;
+  min-width: 350px;
+  max-width: 550px; 
+}
+
+  .svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+.plot-panel {
+  min-width: 550px;
+  max-width: 700px; 
+  width: 700px;
+  height: 550px; 
+}
+
+/*
+table {
+  border: 2px solid black;
+}
+*/
+
+th, td {
+  border: 1px solid #dddddd;
+  padding: 10px;
+}
+ tr:nth-child(even) {
+   background-color: #dddddd;
+ }
+
 

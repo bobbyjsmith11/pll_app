@@ -21,7 +21,14 @@ window.onload = function() {
   
   // synthPll();
   setFilterType();
+  // document.getElementById("refPnTable").addEventListener('change', refTableChangedHandler)
+  var refTable = document.getElementById("refPnTable");
+  refTable.addEventListener('focusout', refTableChangedHandler);
+  refTable.addEventListener('keydown', checkForEnter, true);
+  refPhaseNoise = readReferencePhaseNoise();  // global variable
+  refTableChangedHandler();
 }
+
 
 var PM_PLOT_PRESENT = false;  // indicates that the plotGainPhaseMargin has been called once
 
@@ -58,7 +65,6 @@ var loop_filter = { r2: 0,
                     order: 2 };
 
 
-
 function synthPll () {
   if ( (loop_filter.type == 'passive') && (loop_filter.order == 2) ) {
     solveComponents( loop_type='passive2', gamma=1.024 );
@@ -70,44 +76,8 @@ function synthPll () {
    
 }
 
-/**
- * returns an array of complex numbers for the filter response
- * @param {Array} f
- * @returns {Array}
- */
-function calculateZ( f, t1, t2, a0 ) {
-    T1 = t1;
-    T2 = t2;
-    A0 = a0;
-    var s = math.multiply( math.multiply( math.i,2*Math.PI ), f );
-    var zt2 = math.add( 1, math.multiply(s, t2) );
-    var zt1 = math.add( 1, math.multiply(s, t1) );
-    var Z = [];
-    for ( i=0; i<s.length; i++ ) {
-      var zden = math.multiply( math.multiply(s[i], a0), zt1[i]);
-      Z[i] = math.divide(zt2[i], zden);
-    }
-
-    return Z; 
-}
-
-/* given frequency array and impedance array,
- * return G(s)
- * */
-function calculateG( f, z ) {
-    var s = math.multiply( math.multiply( math.i,2*Math.PI ), f );
-    var K = pll.kphi*pll.kvco;
-    var g = [];
-
-    for ( i=0; i<s.length; i++ ) {
-      g.push( math.multiply( K, math.divide( z[i], s[i] ) ) ); 
-    }
-    return g;
-}
-
 function simulatePll( ) {
   my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop?"
-  // my_url = "{{URL(pll_app,pll_calcs,callSimulatePllOpenLoop)}}"
   dat = "fstart=" + 1
         + "&fstop=" + 100e6
         + "&ptsPerDec=" + 99
@@ -144,15 +114,6 @@ function simulatePll( ) {
             error: function (result) {
             }
   });
-}
-
-function testFun() {
-  // console.log( document.getElementById("t1").style.top );
-  // document.getElementById("t1").style.top = "90%";
-  console.log( $("#pll4_passive_div").width() );
-  // console.log(document.getElementById("t1").parentElement.nodeName);
-  // $("#t1").detach().appendTo("#pll3_passive_div");
-  // console.log(document.getElementById("t1").parentElement.nodeName);
 }
 
 
@@ -195,7 +156,7 @@ function loadPll4PassiveForm() {
   document.getElementById("pll3_passive_div").style.display = "none";
   document.getElementById("pll2_passive_div").style.display = "none";
 
-  document.getElementById("pll4_passive_div").style.display = "block";
+  document.getElementById("pll4_passive_div").style.display = "inline-block";
 
   var mydiv = "#pll4_passive_div";
 
@@ -299,12 +260,11 @@ function loadPll3PassiveForm() {
   document.getElementById("pll2_passive_div").style.display = "none";
   document.getElementById("pll4_passive_div").style.display = "none";
 
-  document.getElementById("pll3_passive_div").style.display = "block";
+  document.getElementById("pll3_passive_div").style.display = "inline-block";
 
   var mydiv = "#pll3_passive_div";
 
   $("#fltTypeLabel").detach().appendTo(mydiv);
-
  
   $("#fcLabel").detach().appendTo(mydiv);
   document.getElementById("fcLabel").style.display = "block";
@@ -402,7 +362,7 @@ function loadPll2PassiveForm() {
   document.getElementById("pll3_passive_div").style.display = "none";
   document.getElementById("pll4_passive_div").style.display = "none";
 
-  document.getElementById("pll2_passive_div").style.display = "block";
+  document.getElementById("pll2_passive_div").style.display = "inline-block";
 
   var mydiv = "#pll2_passive_div";
 
@@ -1042,5 +1002,131 @@ function check_unit( val, unit, id ) {
   }
   return true;
 }
+
+/* Phase noise table events
+ *
+ */
+function refTableChangedHandler() {
+  // console.log('refTablechangedHandler()');
+  var table = document.getElementById("refPnTable");
+  // console.log(table);
+  for (var r = 1, n = table.rows.length; r < n; r++ ) {
+    table.rows[r].cells[0].innerHTML = table.rows[r].cells[0].innerHTML.replace(/[<br>]/gm,"");
+    var f_str = table.rows[r].cells[0].innerHTML;
+    var val_good = check_valid_table_frequency( f_str, table, r, col=0 );
+    if (val_good) {
+      refPhaseNoise.freqs[r-1] = math.unit( table.rows[r].cells[0].innerHTML).value;
+    } else {
+      table.rows[r].cells[0].innerHTML = math.unit(refPhaseNoise.freqs[r-1],"Hz").toString();
+    }
+    
+    // 
+    table.rows[r].cells[1].innerHTML = table.rows[r].cells[1].innerHTML.replace(/[<br>]/gm,"");
+    var p_str = table.rows[r].cells[1].innerHTML;
+    var val_good = check_valid_table_number( p_str, table, r, col=1 );
+    if (val_good) {
+      refPhaseNoise.pns[r-1] = Number( table.rows[r].cells[1].innerHTML );
+    } else {
+      table.rows[r].cells[1].innerHTML = refPhaseNoise.pns[r-1].toString();
+    }
+  }
+
+}
+
+function check_valid_table_number( val, table, row, col=1 ) {
+  if ( isNaN(val) ) {
+    // val is not a number. check if is correctly formatted for unit
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function check_valid_table_frequency( val, table, row, col=0 ) {
+  if ( isNaN(val) ) {
+    // val is not a number. check if is correctly formatted for unit
+    try {
+      // table.rows[row].cells[col].innerHTML = table.rows[row].cells[col].innerHTML.replace(/(\r\n|\n|\r)/gm,"");
+      table.rows[row].cells[col].innerHTML = math.unit(val).toString();
+    }
+    catch(err) {
+      // not formatted correctly, so return false
+      return false;
+    }
+  } else {
+    // val is number so automatically good
+    // set field to user-friendly format
+    table.rows[row].cells[col].innerHTML  = math.unit(val,"Hz").toString();
+  }
+  return true;
+}
+
+function readReferencePhaseNoise() {
+  var pn =   { freqs:     [],
+               pns:       []
+             };
+  var table = document.getElementById("refPnTable");
+  for (var r = 1, n = table.rows.length; r < n; r++ ) {
+    pn.freqs.push( math.unit( table.rows[r].cells[0].innerHTML ).value ); 
+    var pn_point = Number( table.rows[r].cells[1].innerHTML );
+    pn.pns.push( Number(pn_point) );
+    }
+  return pn;
+}
+
+function checkForEnter( e ) {
+  // console.log(e);
+  if (e.key == "Enter") {
+    refTableChangedHandler();
+    $("#refPnTable").focusout;
+  }
+}
+
+function testFun() {
+  // var val_good = check_unit( val_str, "Hz", "fref" );
+  // check_valid_table_frequency( val, table, row, col=0 );
+  console.log(refPhaseNoise.freqs);
+  console.log(refPhaseNoise.pns);
+  // my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop?"
+  // dat = "fstart=" + 1
+  //       + "&fstop=" + 100e6
+  //       + "&ptsPerDec=" + 99
+  //       + "&kphi=" + pll.kphi
+  //       + "&kvco=" + pll.kvco
+  //       + "&N=" + pll.N
+  //       + "&flt_type=" + loop_filter.type
+  //       + "&c1=" + loop_filter.c1
+  //       + "&c2=" + loop_filter.c2
+  //       + "&r2=" + loop_filter.r2
+  //       + "&c3=" + loop_filter.c3 
+  //       + "&c4=" + loop_filter.c4 
+  //       + "&r3=" + loop_filter.r3 
+  //       + "&r4=" + loop_filter.r4;
+  // $.ajax( {
+  //           type: "GET",
+  //           url: my_url,
+  //           datatype: 'json',
+  //           async: true,
+  //           data: dat,
+  //           success: function (data) {
+  //             // console.log(data)
+  //             if (PM_PLOT_PRESENT) {
+  //               updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
+  //               setPm(data.pzero);
+  //               setFc(data.fzero); 
+  //               // console.log("fzero = " + data.fzero);
+  //               // console.log("pzero = " + data.pzero);
+  //             } else {
+  //               plotGainPhaseMargin( data.gains , data.phases, data.freqs );
+  //               PM_PLOT_PRESENT = true;  
+  //             }
+  //           },
+  //           error: function (result) {
+  //           }
+  // });
+}
+
+
+
 
 

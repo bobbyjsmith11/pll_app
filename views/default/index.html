@@ -59,6 +59,7 @@
                                                                           onchange="onKvcoChanged()">
 
   </div>
+
   <div class="diagram-container" id="pll2_passive_div">
     <img src="{{=URL('static','images/pll2_passive.svg')}}"
            width="100%">
@@ -140,21 +141,64 @@
                                                                           onchange="onT4Changed()">
   </div>
 
-  <div class="diagram-container" id="pll3_passive_div" align="center">
+  <div class="diagram-container" id="pll3_passive_div">
       <img src="{{=URL('static','images/pll3_passive.svg')}}"
            width="100%">
   </div>
 
-  <div class="diagram-container" id="pll4_passive_div" align="center">
+  <div class="diagram-container" id="pll4_passive_div">
       <img src="{{=URL('static','images/pll4_passive.svg')}}"
            width="100%">
   </div>
 
-  <!--div class="diagram-container" id="pll4_passive_div2" align="center">
-      <img src="{{=URL('static','images/pll_base.svg')}}" width="100%">
-  </div-->
 
-  <div id="pmGraph" class="svg-containter">
+  <div class="panel with-nav-tabs panel-default plot-panel">
+    <ul class="nav nav-tabs">
+      <li><a data-toggle="tab" href="#loopResponse">loop response</a></li>
+      <li class="active"><a data-toggle="tab" href="#referencePn">reference</a></li>
+    </ul>
+
+    <div class="tab-content">
+
+      <div id="loopResponse" class="tab-pane fade in">
+        <div id="pmGraph" class="svg-container">
+        </div>
+      </div>
+
+      <div id="referencePn" class="tab-pane fade in active">
+        <h3>Weinschel HF ONYX IV</h3>
+        <table class="phase-noise-table" id="refPnTable">
+          <tr>
+            <th>Offset Frequency</th>
+            <th>dBc/Hz</th>
+          <tr>
+            <td contenteditable="true">10 Hz</td>
+            <td contenteditable="true">-138</td>
+          </tr>
+            <td contenteditable="true">100 Hz</td>
+            <td contenteditable="true">-158</td>
+          </tr>
+            <td contenteditable="true">1 kHz</td>
+            <td contenteditable="true">-163</td>
+          </tr>
+            <td contenteditable="true">10 kHz</td>
+            <td contenteditable="true">-165</td>
+          </tr>
+            <td contenteditable="true">100 kHz</td>
+            <td contenteditable="true">-165</td>
+          </tr>
+            <td contenteditable="true">1 MHz</td>
+            <td contenteditable="true">-165</td>
+          </tr>
+            <td contenteditable="true">10 MHz</td>
+            <td contenteditable="true">-165</td>
+          </tr>
+            <td contenteditable="true">100 MHz</td>
+            <td contenteditable="true">-165</td>
+        </table>
+      </div>
+
+    </div>
   </div>
 
 
