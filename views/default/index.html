@@ -154,8 +154,9 @@
 
   <div class="panel with-nav-tabs panel-default plot-panel">
     <ul class="nav nav-tabs">
-      <li><a data-toggle="tab" href="#loopResponse">loop response</a></li>
-      <li class="active"><a data-toggle="tab" href="#referencePn">reference</a></li>
+      <li ><a data-toggle="tab" href="#loopResponse">OPEN LOOP RESPONSE</a></li>
+      <li ><a data-toggle="tab" href="#referencePn">REFERENCE</a></li>
+      <li class="active"><a data-toggle="tab" href="#vcoPn">VCO</a></li>
     </ul>
 
     <div class="tab-content">
@@ -165,7 +166,7 @@
         </div>
       </div>
 
-      <div id="referencePn" class="tab-pane fade in active">
+      <div id="referencePn" class="tab-pane fade in">
 
         <table class="phase-noise-table" id="refPnTable">
           <tr>
@@ -198,6 +199,43 @@
         </table>
 
         <div id="refPnGraph" class="svg-container phase-noise-plot-container">
+        </div>
+
+      </div>
+
+      <div id="vcoPn" class="tab-pane fade in active">
+
+        <table class="phase-noise-table" id="vcoPnTable">
+          <tr>
+            <th>Offset Frequency</th>
+            <th>dBc/Hz</th>
+          <tr>
+            <td contenteditable="true">10 Hz</td>
+            <td contenteditable="true">-10</td>
+          </tr>
+            <td contenteditable="true">100 Hz</td>
+            <td contenteditable="true">-30</td>
+          </tr>
+            <td contenteditable="true">1 kHz</td>
+            <td contenteditable="true">-60</td>
+          </tr>
+            <td contenteditable="true">10 kHz</td>
+            <td contenteditable="true">-90</td>
+          </tr>
+            <td contenteditable="true">100 kHz</td>
+            <td contenteditable="true">-120</td>
+          </tr>
+            <td contenteditable="true">1 MHz</td>
+            <td contenteditable="true">-140</td>
+          </tr>
+            <td contenteditable="true">10 MHz</td>
+            <td contenteditable="true">-160</td>
+          </tr>
+            <td contenteditable="true">100 MHz</td>
+            <td contenteditable="true">-162</td>
+        </table>
+
+        <div id="vcoPnGraph" class="svg-container phase-noise-plot-container">
         </div>
 
       </div>

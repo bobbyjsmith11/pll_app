@@ -827,9 +827,14 @@ def freqPointsPerDecade( fstart, fstop, ptsPerDec ):
     return ar    
 
 def semilogXInterpolate( f, x, y ):
-    """ 
+    """ perform linear interpolation but with the x function
+    in the log domain
+    :Parameters:
+    f (new list of x axis)
+    x (base x axis)
+    y (base y axis)
     :Returns:
-    list
+    new list of y axis
     """
     logx = []
     for i in range(len(x)):
@@ -853,33 +858,13 @@ def callGetInterpolatedPhaseNoise():
     freq_pts =      request.vars.freqs
     pn_pts =        request.vars.pns
 
-    print(fstart)
-    print(fstop)
-    print(ptsPerDec)
-    print(freq_pts)
-    print(pn_pts)
-
     freq_pts = map(float, freq_pts.split(','))
-    print(freq_pts)
     pn_pts = map(float, pn_pts.split(','))
-    print(pn_pts)
     f = freqPointsPerDecade( fstart, fstop, ptsPerDec )
     pns = semilogXInterpolate(f, freq_pts, pn_pts)
-    # f, g, p, fz, pz = simulatePllOpenLoop( fstart,
-    #                                fstop,
-    #                                ptsPerDec,
-    #                                kphi,
-    #                                kvco,
-    #                                N,
-    #                                filt=flt )
-    # 
     d = { 'freqs':f,
           'pns':pns,
         }
-
-    # d = { 'freqs':f,
-    #       'pns':pns,
-    #     }
 
     return response.json(d)
 

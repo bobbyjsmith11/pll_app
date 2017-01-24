@@ -22,16 +22,26 @@ window.onload = function() {
   // synthPll();
   setFilterType();
   // document.getElementById("refPnTable").addEventListener('change', refTableChangedHandler)
+  //
   var refTable = document.getElementById("refPnTable");
   refTable.addEventListener('focusout', refTableChangedHandler);
   refTable.addEventListener('keydown', checkForEnter, true);
   refPhaseNoise = readReferencePhaseNoise();  // global variable
   refTableChangedHandler();
   graphReferencePhaseNoise();
+
+  var vcoTable = document.getElementById("vcoPnTable");
+  vcoTable.addEventListener('focusout', vcoTableChangedHandler);
+  vcoTable.addEventListener('keydown', checkForEnter, true);
+  vcoPhaseNoise = readVcoPhaseNoise();  // global variable
+  vcoTableChangedHandler();
+  graphVcoPhaseNoise();
+
 }
 
 var PM_PLOT_PRESENT = false;  // indicates that plotGainPhaseMargin has been called at least once
 var REF_PLOT_PRESENT = false; // indicates that plotReferencePhaseNoise has been called at least once 
+var VCO_PLOT_PRESENT = false; // indicates that plotVcoPhaseNoise has been called at least once 
 
 
 /* Global object for storing all parameters for
@@ -119,13 +129,9 @@ function simulatePll( ) {
 }
 
 function graphReferencePhaseNoise() {
-  // var val_good = check_unit( val_str, "Hz", "fref" );
-  // check_valid_table_frequency( val, table, row, col=0 );
-  // console.log(refPhaseNoise.freqs);
-  // console.log(refPhaseNoise.pns);
   my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
-  dat = "fstart=" + 1
-        + "&fstop=" + 100e6
+  dat = "fstart=" + math.min( refPhaseNoise.freqs ) 
+        + "&fstop=" + math.max( refPhaseNoise.freqs ) 
         + "&ptsPerDec=" + 99
         + "&freqs=" + refPhaseNoise.freqs
         + "&pns=" + refPhaseNoise.pns;
@@ -137,14 +143,8 @@ function graphReferencePhaseNoise() {
             async: true,
             data: dat,
             success: function (data) {
-              // globalD = data;
-              console.log(data);
               if (REF_PLOT_PRESENT) {
                 updateReferencePhaseNoise( data.pns, data.freqs );
-                // setPm(data.pzero);
-                // setFc(data.fzero); 
-                // console.log("fzero = " + data.fzero);
-                // console.log("pzero = " + data.pzero);
               } else {
                 plotReferencePhaseNoise( data.pns, data.freqs );
                 REF_PLOT_PRESENT = true;  
@@ -155,6 +155,32 @@ function graphReferencePhaseNoise() {
   });
 }
 
+function graphVcoPhaseNoise() {
+  my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
+  dat = "fstart=" + math.min( vcoPhaseNoise.freqs ) 
+        + "&fstop=" + math.max( vcoPhaseNoise.freqs ) 
+        + "&ptsPerDec=" + 99
+        + "&freqs=" + vcoPhaseNoise.freqs
+        + "&pns=" + vcoPhaseNoise.pns;
+
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              if (VCO_PLOT_PRESENT) {
+                updateVcoPhaseNoise( data.pns, data.freqs );
+              } else {
+                plotVcoPhaseNoise( data.pns, data.freqs );
+                VCO_PLOT_PRESENT = true;  
+              }
+            },
+            error: function (result) {
+            }
+  });
+}
 function setFilterType() {
   if ( document.getElementById("selFilterType").value == 0 ) {
     loop_filter.type = 'passive';
@@ -1071,6 +1097,32 @@ function refTableChangedHandler() {
   graphReferencePhaseNoise(); 
 }
 
+function vcoTableChangedHandler() {
+  var table = document.getElementById("vcoPnTable");
+  // console.log(table);
+  for (var r = 1, n = table.rows.length; r < n; r++ ) {
+    table.rows[r].cells[0].innerHTML = table.rows[r].cells[0].innerHTML.replace(/[<br>]/gm,"");
+    var f_str = table.rows[r].cells[0].innerHTML;
+    var val_good = check_valid_table_frequency( f_str, table, r, col=0 );
+    if (val_good) {
+      vcoPhaseNoise.freqs[r-1] = math.unit( table.rows[r].cells[0].innerHTML).value;
+    } else {
+      table.rows[r].cells[0].innerHTML = math.unit(vcoPhaseNoise.freqs[r-1],"Hz").toString();
+    }
+    
+    // 
+    table.rows[r].cells[1].innerHTML = table.rows[r].cells[1].innerHTML.replace(/[<br>]/gm,"");
+    var p_str = table.rows[r].cells[1].innerHTML;
+    var val_good = check_valid_table_number( p_str, table, r, col=1 );
+    if (val_good) {
+      vcoPhaseNoise.pns[r-1] = Number( table.rows[r].cells[1].innerHTML );
+    } else {
+      table.rows[r].cells[1].innerHTML = vcoPhaseNoise.pns[r-1].toString();
+    }
+  }
+  graphVcoPhaseNoise(); 
+}
+
 function check_valid_table_number( val, table, row, col=1 ) {
   if ( isNaN(val) ) {
     // val is not a number. check if is correctly formatted for unit
@@ -1112,6 +1164,19 @@ function readReferencePhaseNoise() {
   return pn;
 }
 
+function readVcoPhaseNoise() {
+  var pn =   { freqs:     [],
+               pns:       []
+             };
+  var table = document.getElementById("vcoPnTable");
+  for (var r = 1, n = table.rows.length; r < n; r++ ) {
+    pn.freqs.push( math.unit( table.rows[r].cells[0].innerHTML ).value ); 
+    var pn_point = Number( table.rows[r].cells[1].innerHTML );
+    pn.pns.push( Number(pn_point) );
+    }
+  return pn;
+}
+
 function checkForEnter( e ) {
   // console.log(e);
   if (e.key == "Enter") {
@@ -1123,11 +1188,9 @@ function checkForEnter( e ) {
 function testFun() {
   // var val_good = check_unit( val_str, "Hz", "fref" );
   // check_valid_table_frequency( val, table, row, col=0 );
-  console.log(refPhaseNoise.freqs);
-  console.log(refPhaseNoise.pns);
   my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
-  dat = "fstart=" + 1
-        + "&fstop=" + 100e6
+  dat = "fstart=" + math.min( refPhaseNoise.freqs ) 
+        + "&fstop=" + math.max( refPhaseNoise.freqs ) 
         + "&ptsPerDec=" + 99
         + "&freqs=" + refPhaseNoise.freqs
         + "&pns=" + refPhaseNoise.pns;
@@ -1139,15 +1202,8 @@ function testFun() {
             async: true,
             data: dat,
             success: function (data) {
-              // globalD = data;
-              console.log(data);
               if (REF_PLOT_PRESENT) {
                 updateReferencePhaseNoise( data.pns, data.freqs );
-                // updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
-                // setPm(data.pzero);
-                // setFc(data.fzero); 
-                // console.log("fzero = " + data.fzero);
-                // console.log("pzero = " + data.pzero);
               } else {
                 plotReferencePhaseNoise( data.pns, data.freqs );
                 REF_PLOT_PRESENT = true;  
