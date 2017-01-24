@@ -8,8 +8,9 @@
 from gluon.tools import Service
 service = Service(globals())
 
+from scipy.interpolate import interp1d
 import numpy as np
-
+import matplotlib.pylab as plt
 
 def call():
     """
@@ -323,7 +324,6 @@ class PllThirdOrderPassive( PllSecondOrderPassive ):
                  t3 ):
         omega_c = 2*np.pi*fc
         k1 = kphi*kvco/((omega_c**2)*(N))
-        print(N)
         k2 = np.sqrt( (1+(omega_c*t2)**2)/((1+(omega_c*t1)**2)*(1+(omega_c*t3)**2) ) )
         return k1*k2
 
@@ -526,7 +526,6 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
                  t4):
         omega_c = 2*np.pi*fc
         k1 = kphi*kvco/((omega_c**2)*(N))
-        print(N)
         k2 = np.sqrt(
                 (1+(omega_c*t2)**2)/((1+(omega_c*t1)**2)*(1+(omega_c*t3)**2)*(1+(omega_c*t4)**2) ) 
                     )
@@ -823,9 +822,92 @@ def freqPointsPerDecade( fstart, fstop, ptsPerDec ):
         newDec = 10**i
         nextDec = 10**(i+1)
         inc = float((nextDec - newDec))/float(ptsPerDec)
-        for j in range(1,ptsPerDec):
+        for j in range(1,ptsPerDec+1):
             val = newDec + j*inc
             ar.append(val)
     return ar    
+
+def testInterpolateArray( ):
+    f = freqPointsPerDecade( 1, 100e6, 10 )
+    x = [10,100,1e3,10e3,100e3,1e6,10e6]
+    y = [-90,-110,-130,-150,-160,-165,-165]
+  
+    # logx = []
+    # for i in range(len(x)):
+    #     logx.append(np.log10(x[i]))
+    # logf = []
+    # for i in range(len(f)):
+    #     logf.append(np.log10(f[i]))
+
+    # pn = np.interp(logf, logx, y)
+ 
+    # func = interp1d(logx,y, kind='cubic')
+    # func = interp1d(logx,y,)
+    # pn = func(logf)
+   
+    pn = semilogXInterpolate(f,x,y)
+    plt.semilogx(f,pn)
+    plt.grid(True)
+    plt.show()
+    
+    return f, pn
+
+def semilogXInterpolate( f, x, y ):
+    """ 
+    :Returns:
+    list
+    """
+    logx = []
+    for i in range(len(x)):
+        logx.append(np.log10(x[i]))
+    logf = []
+    for i in range(len(f)):
+        logf.append(np.log10(f[i]))
+
+    pn = np.interp(logf, logx, y)
+    lst = []
+    lst.extend(pn)
+    return lst 
+
+@service.json
+def callGetInterpolatedPhaseNoise():
+    """
+    """
+    fstart =        float(request.vars.fstart)
+    fstop =         float(request.vars.fstop)
+    ptsPerDec =     int(request.vars.ptsPerDec)
+    freq_pts =      request.vars.freqs
+    pn_pts =        request.vars.pns
+
+    print(fstart)
+    print(fstop)
+    print(ptsPerDec)
+    print(freq_pts)
+    print(pn_pts)
+
+    freq_pts = map(float, freq_pts.split(','))
+    print(freq_pts)
+    pn_pts = map(float, pn_pts.split(','))
+    print(pn_pts)
+    f = freqPointsPerDecade( fstart, fstop, ptsPerDec )
+    pns = semilogXInterpolate(f, freq_pts, pn_pts)
+    # f, g, p, fz, pz = simulatePllOpenLoop( fstart,
+    #                                fstop,
+    #                                ptsPerDec,
+    #                                kphi,
+    #                                kvco,
+    #                                N,
+    #                                filt=flt )
+    # 
+    d = { 'freqs':f,
+          'pns':pns,
+        }
+
+    # d = { 'freqs':f,
+    #       'pns':pns,
+    #     }
+
+    return response.json(d)
+
 
 

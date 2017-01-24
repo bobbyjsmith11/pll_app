@@ -27,10 +27,12 @@ window.onload = function() {
   refTable.addEventListener('keydown', checkForEnter, true);
   refPhaseNoise = readReferencePhaseNoise();  // global variable
   refTableChangedHandler();
+  graphReferencePhaseNoise();
 }
 
+var PM_PLOT_PRESENT = false;  // indicates that plotGainPhaseMargin has been called at least once
+var REF_PLOT_PRESENT = false; // indicates that plotReferencePhaseNoise has been called at least once 
 
-var PM_PLOT_PRESENT = false;  // indicates that the plotGainPhaseMargin has been called once
 
 /* Global object for storing all parameters for
  * the phase-locked loop
@@ -116,6 +118,42 @@ function simulatePll( ) {
   });
 }
 
+function graphReferencePhaseNoise() {
+  // var val_good = check_unit( val_str, "Hz", "fref" );
+  // check_valid_table_frequency( val, table, row, col=0 );
+  // console.log(refPhaseNoise.freqs);
+  // console.log(refPhaseNoise.pns);
+  my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
+  dat = "fstart=" + 1
+        + "&fstop=" + 100e6
+        + "&ptsPerDec=" + 99
+        + "&freqs=" + refPhaseNoise.freqs
+        + "&pns=" + refPhaseNoise.pns;
+
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              // globalD = data;
+              console.log(data);
+              if (REF_PLOT_PRESENT) {
+                updateReferencePhaseNoise( data.pns, data.freqs );
+                // setPm(data.pzero);
+                // setFc(data.fzero); 
+                // console.log("fzero = " + data.fzero);
+                // console.log("pzero = " + data.pzero);
+              } else {
+                plotReferencePhaseNoise( data.pns, data.freqs );
+                REF_PLOT_PRESENT = true;  
+              }
+            },
+            error: function (result) {
+            }
+  });
+}
 
 function setFilterType() {
   if ( document.getElementById("selFilterType").value == 0 ) {
@@ -1030,7 +1068,7 @@ function refTableChangedHandler() {
       table.rows[r].cells[1].innerHTML = refPhaseNoise.pns[r-1].toString();
     }
   }
-
+  graphReferencePhaseNoise(); 
 }
 
 function check_valid_table_number( val, table, row, col=1 ) {
@@ -1087,43 +1125,37 @@ function testFun() {
   // check_valid_table_frequency( val, table, row, col=0 );
   console.log(refPhaseNoise.freqs);
   console.log(refPhaseNoise.pns);
-  // my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop?"
-  // dat = "fstart=" + 1
-  //       + "&fstop=" + 100e6
-  //       + "&ptsPerDec=" + 99
-  //       + "&kphi=" + pll.kphi
-  //       + "&kvco=" + pll.kvco
-  //       + "&N=" + pll.N
-  //       + "&flt_type=" + loop_filter.type
-  //       + "&c1=" + loop_filter.c1
-  //       + "&c2=" + loop_filter.c2
-  //       + "&r2=" + loop_filter.r2
-  //       + "&c3=" + loop_filter.c3 
-  //       + "&c4=" + loop_filter.c4 
-  //       + "&r3=" + loop_filter.r3 
-  //       + "&r4=" + loop_filter.r4;
-  // $.ajax( {
-  //           type: "GET",
-  //           url: my_url,
-  //           datatype: 'json',
-  //           async: true,
-  //           data: dat,
-  //           success: function (data) {
-  //             // console.log(data)
-  //             if (PM_PLOT_PRESENT) {
-  //               updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
-  //               setPm(data.pzero);
-  //               setFc(data.fzero); 
-  //               // console.log("fzero = " + data.fzero);
-  //               // console.log("pzero = " + data.pzero);
-  //             } else {
-  //               plotGainPhaseMargin( data.gains , data.phases, data.freqs );
-  //               PM_PLOT_PRESENT = true;  
-  //             }
-  //           },
-  //           error: function (result) {
-  //           }
-  // });
+  my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
+  dat = "fstart=" + 1
+        + "&fstop=" + 100e6
+        + "&ptsPerDec=" + 99
+        + "&freqs=" + refPhaseNoise.freqs
+        + "&pns=" + refPhaseNoise.pns;
+
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              // globalD = data;
+              console.log(data);
+              if (REF_PLOT_PRESENT) {
+                updateReferencePhaseNoise( data.pns, data.freqs );
+                // updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
+                // setPm(data.pzero);
+                // setFc(data.fzero); 
+                // console.log("fzero = " + data.fzero);
+                // console.log("pzero = " + data.pzero);
+              } else {
+                plotReferencePhaseNoise( data.pns, data.freqs );
+                REF_PLOT_PRESENT = true;  
+              }
+            },
+            error: function (result) {
+            }
+  });
 }
 
 
