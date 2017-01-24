@@ -8,9 +8,8 @@
 from gluon.tools import Service
 service = Service(globals())
 
-from scipy.interpolate import interp1d
 import numpy as np
-import matplotlib.pylab as plt
+# import matplotlib.pylab as plt
 
 def call():
     """
@@ -826,31 +825,6 @@ def freqPointsPerDecade( fstart, fstop, ptsPerDec ):
             val = newDec + j*inc
             ar.append(val)
     return ar    
-
-def testInterpolateArray( ):
-    f = freqPointsPerDecade( 1, 100e6, 10 )
-    x = [10,100,1e3,10e3,100e3,1e6,10e6]
-    y = [-90,-110,-130,-150,-160,-165,-165]
-  
-    # logx = []
-    # for i in range(len(x)):
-    #     logx.append(np.log10(x[i]))
-    # logf = []
-    # for i in range(len(f)):
-    #     logf.append(np.log10(f[i]))
-
-    # pn = np.interp(logf, logx, y)
- 
-    # func = interp1d(logx,y, kind='cubic')
-    # func = interp1d(logx,y,)
-    # pn = func(logf)
-   
-    pn = semilogXInterpolate(f,x,y)
-    plt.semilogx(f,pn)
-    plt.grid(True)
-    plt.show()
-    
-    return f, pn
 
 def semilogXInterpolate( f, x, y ):
     """ 
