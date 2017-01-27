@@ -585,7 +585,7 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
         return val
 
 @service.json
-def callSimulatePllOpenLoop():
+def callSimulatePll():
     """
     """
     fstart =        float(request.vars.fstart)
@@ -594,6 +594,7 @@ def callSimulatePllOpenLoop():
     kphi =          float(request.vars.kphi)
     kvco =          float(request.vars.kvco)
     N =             float(request.vars.N)
+    R =             float(request.vars.R)
     flt_type =      request.vars.flt_type
     c1 =            float(request.vars.c1)
     c2 =            float(request.vars.c2)
@@ -612,20 +613,23 @@ def callSimulatePllOpenLoop():
             'r4':r4,
             'flt_type':flt_type
             }
-    # d = flt 
-    f, g, p, fz, pz = simulatePllOpenLoop( fstart,
-                                   fstop,
-                                   ptsPerDec,
-                                   kphi,
-                                   kvco,
-                                   N,
-                                   filt=flt )
+
+    f, g, p, fz, pz, ref_cl, vco_cl = simulatePll( fstart,
+                                                   fstop,
+                                                   ptsPerDec,
+                                                   kphi,
+                                                   kvco,
+                                                   N,
+                                                   R,
+                                                   filt=flt )
     
     d = { 'freqs':f,
           'gains':g,
           'phases':p,
           'fzero': fz,
           'pzero': pz,
+          'ref_cl': ref_cl,
+          'vco_cl': vco_cl,
         }
     return response.json(d)
 
@@ -636,6 +640,7 @@ def testSimulateOpenLoop():
     kphi = 1e-3
     kvco = 60e6
     N = 39200
+    R = 200
     flt = {
             'c1':52.4e-12,
             'c2':1.03e-9,
@@ -646,17 +651,18 @@ def testSimulateOpenLoop():
             'r4':279e3,
             'flt_type':"passive" 
            }
-    f,g,p,fz,pz = simulatePllOpenLoop( fstart, 
-                         fstop, 
-                         ptsPerDec,
-                         kphi,
-                         kvco,
-                         N,
-                         filt=flt)
+    f,g,p,fz,pz,ref_cl,vco_cl = simulatePll( fstart, 
+                                             fstop, 
+                                             ptsPerDec,
+                                             kphi,
+                                             kvco,
+                                             N,
+                                             R,
+                                             filt=flt)
 
-    return f, g, p, fz, pz
+    return f, g, p, fz, pz, ref_cl, vco_cl
 
-def getInterpolatedFzeroPzer( f, g, p ):
+def getInterpolatedFzeroPzero( f, g, p ):
     """ look at the points of f, g and p surrounding where
     g crosses zero and interpolate f and p at 0
     """
@@ -686,14 +692,15 @@ def getIndexZeroDbCrossover( g ):
             return i
     return None
 
-def simulatePllOpenLoop( fstart, 
-                         fstop, 
-                         ptsPerDec,
-                         kphi,
-                         kvco,
-                         N,
-                         filt=None,
-                         coeffs=None):
+def simulatePll( fstart, 
+                 fstop, 
+                 ptsPerDec,
+                 kphi,
+                 kvco,
+                 N,
+                 R,
+                 filt=None,
+                 coeffs=None):
     """ simulate an arbitrary phase-locked loop using either
     filter coefficients or component values. return 3 lists:
     f (frequencies), g_ol (open-loop gain), phases (open-loop phases)  
@@ -738,15 +745,25 @@ def simulatePllOpenLoop( fstart,
         pass
     # complex frequency variable
     s = np.array(f)*2*np.pi*1j 
+
     # loop filter impedance
     z = (1 + s*t2)/(s*(a[3]*s**3 + a[2]*s**2 + a[1]*s + a[0])) 
+
     # G(s)
     g = kphi*kvco*z/s
+
     # # Open-loop gain 
     g_ol = g/N
     g_ol_db = 10*np.log10(np.absolute(g_ol))
     ph_ol = 180 + np.unwrap(np.angle(g_ol))*180/np.pi
-    # ph_ol = 180 + np.angle(g_ol)*180/np.pi
+
+    # # Closed-loop reference transfer gain
+    cl_r = (1.0/R)*(g/(1+g/N))
+    cl_r_db = 10*np.log10(np.absolute(cl_r))
+
+    # # Closed-loop VCO transfer gain
+    cl_vco = 1.0/(1+g/N)
+    cl_vco_db = 10*np.log10(np.absolute(cl_vco))
 
     # convert gains and phases to lists
     # cannot return numpy array to javascript
@@ -754,8 +771,12 @@ def simulatePllOpenLoop( fstart,
     p = []
     g.extend(g_ol_db)
     p.extend(ph_ol)
-    fz, pz = getInterpolatedFzeroPzer( f, g, p )
-    return f, g, p, fz, pz
+    fz, pz = getInterpolatedFzeroPzero( f, g, p )
+    ref_cl = []
+    vco_cl = []
+    ref_cl.extend(cl_r_db)
+    vco_cl.extend(cl_vco_db)
+    return f, g, p, fz, pz, ref_cl, vco_cl
 
 def calculateCoefficients( c1=0, 
                            c2=0, 

@@ -40,6 +40,7 @@ window.onload = function() {
 }
 
 var PM_PLOT_PRESENT = false;  // indicates that plotGainPhaseMargin has been called at least once
+var CL_PLOT_PRESENT = false;  // indicates that plotClosedLoop has been called at least once
 var REF_PLOT_PRESENT = false; // indicates that plotReferencePhaseNoise has been called at least once 
 var VCO_PLOT_PRESENT = false; // indicates that plotVcoPhaseNoise has been called at least once 
 
@@ -89,13 +90,14 @@ function synthPll () {
 }
 
 function simulatePll( ) {
-  my_url = "/pll_app/pll_calcs/callSimulatePllOpenLoop?"
+  my_url = "/pll_app/pll_calcs/callSimulatePll?"
   dat = "fstart=" + 1
         + "&fstop=" + 100e6
         + "&ptsPerDec=" + 99
         + "&kphi=" + pll.kphi
         + "&kvco=" + pll.kvco
         + "&N=" + pll.N
+        + "&R=" + pll.R
         + "&flt_type=" + loop_filter.type
         + "&c1=" + loop_filter.c1
         + "&c2=" + loop_filter.c2
@@ -116,11 +118,12 @@ function simulatePll( ) {
                 updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
                 setPm(data.pzero);
                 setFc(data.fzero); 
-                // console.log("fzero = " + data.fzero);
-                // console.log("pzero = " + data.pzero);
+                updateClosedLoopGraph( data.ref_cl , data.vco_cl, data.freqs );
               } else {
                 plotGainPhaseMargin( data.gains , data.phases, data.freqs );
                 PM_PLOT_PRESENT = true;  
+                plotClosedLoop( data.ref_cl , data.vco_cl, data.freqs );
+                CL_PLOT_PRESENT = true;  
               }
             },
             error: function (result) {

@@ -284,6 +284,259 @@ function updateGainPhaseMarginGraph (gdb, phi, freq, dur=500) {
             .attr("d", linefunction2(linedata) );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  CLOSED LOOP RESPONSE GRAPHS
+//
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+/* Sets up the initial open-loop gain and phase margin graph
+ * */
+function plotClosedLoop ( clRef, clVco, freq) {
+
+    // define dimensions of graph
+
+    width = 700;
+    height = 500;
+    m = [80, 80, 80, 80]; // margins
+    w = width - m[1] - m[3]; // width
+    h  = height - m[0] - m[2]; // height
+
+    // Add an SVG element with the desired dimensions and margin.
+    var graph = d3.select("#clGraph")
+          .append("svg")
+          .attr("preserveAspectRatio", "xMinYMin meet")
+          .attr("viewBox", "0 0 700 500")
+          .classed("svg-content-responsive", true)
+          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+    linedata = [];
+    for ( i=0; i<freq.length; i++ ) {
+      linedata.push( { "x": freq[i],   "y": clRef[i],   "p": clVco[i]} );
+    }
+    
+    var fstart = linedata[0].x;
+    var fstop = linedata[linedata.length - 1].x;
+
+    // X scale will fit all values within pixels 0-w
+    x = d3.scale.log()
+              .range([0, w]);
+
+    // X scale will fit all values within pixels h-0 (note, scale is inverted
+    // so bigger is up) 
+    y = d3.scale.linear()
+                .range([h, 0]);
+
+    y2 = d3.scale.linear()
+                .range([h, 0]);
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example x(d.x) means the x-scaled value of our data d.x.
+    var linefunction = d3.svg.line() 
+                          .x( function(d) { 
+                            return x(d.x); } )  
+                          .y( function(d) { 
+                            return y(d.y); } )
+                          .interpolate("linear");
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example y(d.y) means the x-scaled value of our data d.y.
+    var linefunction2 = d3.svg.line() 
+                          .x( function(d) { 
+                            return x(d.x); } )  
+                          .y( function(d) { 
+                            return y2(d.p); } )
+                          .interpolate("linear");
+
+    // set the domain for our x-axis (frequency)
+    x.domain([fstart, fstop]);
+
+   	// automatically determining max range can work something like this
+   	// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
+    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
+
+    // create xAxis
+    
+    xAxisMinor = d3.svg.axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickFormat( "" )
+                  .tickSize(-h);
+
+    xAxisMajor = d3.svg.axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickValues([10,100,1000,10000,100000,1000000,10000000])
+                  .tickFormat( d3.format("s") )
+                  .tickSize(-h);
+
+    // create left and right yAxes
+    yAxisLeft = d3.svg.axis()
+                      .scale(y)
+                      .orient("left")
+                      .ticks(6);
+
+    yAxisRight = d3.svg.axis()
+                      .scale(y2)
+                      .orient("right")
+                      .ticks(4);
+
+    // Add the y-axis to the left
+    graph.append("svg:g")
+          .attr("class", "y axis")
+          .attr("id", "yAxisClRef")
+          .style("fill","steelblue")
+          .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
+          .call(yAxisLeft);
+
+
+    // Add the y-axis to the right
+    graph.append("svg:g")
+          .attr("class", "y axis")
+          .attr("id", "yAxisClVco")
+          .style("fill","red")
+          .attr("transform", "translate("+(w + m[0])+"," + m[1] + ")")
+          .call(yAxisRight);
+
+    // add the graph title
+    graph.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate("+ (w/2 + m[0]) +","+ (-m[0]/2 + m[1])+")")
+          .attr("font-size", "18")
+          .text("Closed Loop Response");
+
+    // add the x axis label
+    graph.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate("+ (w/2 + m[0]) +","+ (h+m[0]/2 + m[1])+")")
+          .text("Offset Frequency in Hz");
+
+    // add the left y axis label
+    graph.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate("+ (-m[1]/2 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
+          .attr("fill", "steelblue")
+          .text("Reference Transfer Gain (dB)");
+
+    // add the left y axis label
+    graph.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate("+ (w+m[1]/2 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
+          .attr("fill", "red")
+          .text("VCO Transfer Gain (dB)");
+
+    graph.append("svg:g")
+          .attr("class", "x axis")
+          .attr("id", "xAxisMinor")
+          .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
+          .call(xAxisMinor)
+            .classed("minor", true);
+
+    graph.append("svg:g")
+          .attr("class", "x axis")
+          .attr("id", "xAxisMajor")
+          .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
+          .call(xAxisMajor);
+
+    // Add the line by appending an svg:path element with the data line we created above
+    // do this AFTER the axes above so that the line is above the tick-lines
+    graph.append("path")
+            .attr("class", "line")
+            .attr("id", "cl_ref")
+            .attr("d", linefunction(linedata) )
+            .attr("fill", "none")
+            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
+            .style("stroke", "steelblue");
+    graph.append("path")
+            .attr("class", "line")
+            .attr("id", "cl_vco")
+            .attr("d", linefunction2(linedata) )
+            .attr("fill", "none")
+            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
+            .style("stroke", "red");
+
+}
+
+
+/* updates the closed loop simulation graph
+ * with the new data
+ * @param {Array} refCl - open loop gain array in db
+ * @param {Array} vcoCl - open loop phase margin array in degrees
+ * @param {Array} freq - frequency array in Hz
+ * @param {Number} dur - duration of graph transition
+*/
+function updateClosedLoopGraph (clRef, clVco, freq, dur=500) {
+    // get the line data
+    var linedata = [];
+    for ( i=0; i<freq.length; i++ ) {
+      linedata.push( { "x": freq[i],   "y": clRef[i],   "p": clVco[i]} );
+    }
+    // X scale will fit all values within pixels 0-w
+    var x = d3.scale.log()
+              .range([0, w]);
+
+    var fstart = linedata[0].x;
+    var fstop = linedata[linedata.length - 1].x;
+
+    // set the domain for our x-axis (frequency)
+    x.domain([fstart, fstop]);
+
+   	// // automatically determining max range can work something like this
+   	// // var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
+    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example x(d.x) means the x-scaled value of our data d.x.
+    var linefunction = d3.svg.line() 
+                          .x( function(d) { 
+                            return x(d.x); } )  
+                          .y( function(d) { 
+                            return y(d.y); } )
+                          .interpolate("linear");
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example y(d.y) means the x-scaled value of our data d.y.
+    var linefunction2 = d3.svg.line() 
+                          .x( function(d) { 
+                            return x(d.x); } )  
+                          .y( function(d) { 
+                            return y2(d.p); } )
+                          .interpolate("linear");
+
+    var graph = d3.select("#clGraph").transition();
+
+    graph.select("#xAxisMinor")
+            .transition()
+            .duration(dur)
+            .call(xAxisMinor);
+
+    graph.select("#xAxisMajor")
+            .transition()
+            .duration(dur)
+            .call(xAxisMajor);
+
+    graph.select("#yAxisClRef")
+            .transition()
+            .duration(dur)
+            .call(yAxisLeft);
+
+    graph.select("#yAxisClVco")
+            .transition()
+            .duration(dur)
+            .call(yAxisRight);
+    
+    graph.select("#cl_ref")
+            .duration(dur)
+            .attr("d", linefunction(linedata) );
+
+    graph.select("#cl_vco")
+            .duration(dur)
+            .attr("d", linefunction2(linedata) );
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
