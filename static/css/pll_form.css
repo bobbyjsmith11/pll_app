@@ -3,13 +3,13 @@
 .pll-form-input {
   width: 80px;
   /* background:#00FF00; */
-  border:2px solid black;
+  /*border:2px solid black;*/
 }
 
 .pll-component-input {
   width: 90px;
   /* background:#C0C0C0; */
-  border:2px solid black;
+  /* border:2px solid black;*/
 }
 
 .diagram-container {
@@ -74,4 +74,24 @@ th, td {
    background-color: #dddddd;
  }
 
+
+#pllIcAttributes {
+  float: left;
+}
+  
+  #pllFomLabel {
+    width:80px;
+  }
+
+  #pllFom {
+    width: 80px;
+  }
+
+  #pllFlickerLabel {
+    width:80px;
+  }
+
+  #pllFlicker {
+    width: 80px;
+  }
 

@@ -1153,7 +1153,6 @@ function check_valid_table_frequency( val, table, row, col=0 ) {
   }
   return true;
 }
-
 function readReferencePhaseNoise() {
   var pn =   { freqs:     [],
                pns:       []
@@ -1189,32 +1188,19 @@ function checkForEnter( e ) {
 }
 
 function testFun() {
-  // var val_good = check_unit( val_str, "Hz", "fref" );
-  // check_valid_table_frequency( val, table, row, col=0 );
-  my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
-  dat = "fstart=" + math.min( refPhaseNoise.freqs ) 
-        + "&fstop=" + math.max( refPhaseNoise.freqs ) 
-        + "&ptsPerDec=" + 99
-        + "&freqs=" + refPhaseNoise.freqs
-        + "&pns=" + refPhaseNoise.pns;
 
-  $.ajax( {
-            type: "GET",
-            url: my_url,
-            datatype: 'json',
-            async: true,
-            data: dat,
-            success: function (data) {
-              if (REF_PLOT_PRESENT) {
-                updateReferencePhaseNoise( data.pns, data.freqs );
-              } else {
-                plotReferencePhaseNoise( data.pns, data.freqs );
-                REF_PLOT_PRESENT = true;  
-              }
-            },
-            error: function (result) {
-            }
-  });
+  data = { 'freqs': [10,100],
+           'pns': [-90,-100]
+  }
+
+  $('#totalPnPane').DataTable( {
+    data: data,
+    colums: [
+      { data: 'freqs'},
+      { data: 'pns'}
+    ]
+  } );
+
 }
 
 
