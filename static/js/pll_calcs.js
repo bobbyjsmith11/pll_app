@@ -56,7 +56,10 @@ var pll =   { fref:     10e6,
               fc:       10e3,
               kphi:     1e-3,
               kvco:     60e6,
-              pm:       49.2 };
+              pm:       49.2,
+              fom:      -227,
+              flicker:  -268
+            };
 
 // supports up to 4th order passive or active
 var loop_filter = { r2: 0,
@@ -1043,6 +1046,21 @@ function onRChanged() {
   synthPll();
 }
 
+/* User changes Pll Figure of Merit. 
+ * */
+function onFomChanged() {
+  pll.fom = parseFloat( document.getElementById("pllFom").value );
+
+  synthPll();
+}
+
+/* User changes Pll flicker noise changed
+ * */
+function onFlickerChanged() {
+  pll.flicker = parseFloat( document.getElementById("pllFlicker").value );
+
+  synthPll();
+}
 
 /* checks the value of the user input for proper formatting against
  * the unit. returns true if good.
@@ -1189,17 +1207,38 @@ function checkForEnter( e ) {
 
 function testFun() {
 
-  data = { 'freqs': [10,100],
-           'pns': [-90,-100]
-  }
+  my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
+  dat = "freqs=" + refPhaseNoise.freqs 
+        + "&refPn=" + refPhaseNoise.pns
+        + "&vcoPn=" + vcoPhaseNoise.pns
+        + "&pllFom=" + pll.fom
+        + "&pllFlicker=" + pll.flicker
+        + "&kphi=" + pll.kphi
+        + "&kvco=" + pll.kvco
+        + "&fpfd=" + pll.fpfd
+        + "&N=" + pll.N
+        + "&R=" + pll.R
+        + "&flt_type=" + loop_filter.type
+        + "&c1=" + loop_filter.c1
+        + "&c2=" + loop_filter.c2
+        + "&r2=" + loop_filter.r2
+        + "&c3=" + loop_filter.c3 
+        + "&c4=" + loop_filter.c4 
+        + "&r3=" + loop_filter.r3 
+        + "&r4=" + loop_filter.r4;
 
-  $('#totalPnPane').DataTable( {
-    data: data,
-    colums: [
-      { data: 'freqs'},
-      { data: 'pns'}
-    ]
-  } );
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              console.log(data)
+            },
+            error: function (result) {
+            }
+  });
 
 }
 

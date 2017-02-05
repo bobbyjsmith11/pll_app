@@ -1,16 +1,5 @@
 @charset "UTF-8";
 
-.pll-form-input {
-  width: 80px;
-  /* background:#00FF00; */
-  /*border:2px solid black;*/
-}
-
-.pll-component-input {
-  width: 90px;
-  /* background:#C0C0C0; */
-  /* border:2px solid black;*/
-}
 
 .diagram-container {
   width: 100%;
@@ -20,8 +9,8 @@
   margin: 10px; 
   /* background-color:#2ec771;*/
   border:2px solid black;
-  min-width: 550px;
-  max-width: 700px; 
+  min-width: 700px;
+  max-width: 750px; 
 }
 
 #blkDiag {
@@ -39,9 +28,25 @@
   /*padding-bottom: 100%;*/
   vertical-align: middle;
   overflow: hidden;
-  min-width: 350px;
-  max-width: 550px; 
+  min-width: 500px;
+  max-width: 750px; 
 }
+
+  #pmGraph {
+  }
+
+  #clGraph {
+  }
+
+  #vcoPnGraph {
+    max-width: 600px; 
+    float: right;
+  }
+
+  #refPnGraph {
+    max-width: 600px; 
+    float: right;
+  }
 
   .svg-content {
     display: inline-block;
@@ -50,20 +55,17 @@
     left: 0;
   }
 
+
 .plot-panel {
   display: inline-block;
-  min-width: 550px;
-  max-width: 1000px; 
-  width: 800px;
-  height: 550px; 
+  min-width: 850px;
+  max-width: 950px; 
+  width: 850px;
+  height: 600px; 
 }
 
 .phase-noise-table {
   float: left;
-}
-
-.phase-noise-plot-container {
-  float: right;
 }
 
 th, td {
@@ -79,19 +81,86 @@ th, td {
   float: left;
 }
   
-  #pllFomLabel {
-    width:80px;
+.pll-form-input {
+  width: 80px;
+  /* background:#00FF00;
+  /*border:2px solid black;*/
+}
+
+.pll-component-input {
+  width: 90px;
+  /* background:#00FF00;
+  /* border:2px solid black;*/
+}
+
+  #fomLabel {
+    position: absolute;
+    top: 75%;
+    left: 65%;
+    width:150px;
+    text-align: right;
   }
 
   #pllFom {
+    position: absolute;
     width: 80px;
+    top: 73%;
+    left: 87%;
   }
 
-  #pllFlickerLabel {
-    width:80px;
+  #flickerLabel {
+    position: absolute;
+    top: 87%;
+    left: 65%;
+    width:150px;
+    text-align: right;
   }
 
   #pllFlicker {
+    position: absolute;
     width: 80px;
+    top: 85%;
+    left: 87%;
   }
 
+  #fref {
+    position: absolute;
+    top: 62%;
+    left: 0.5%;
+  }
+
+  #fout {
+    position: absolute;
+    top: 46%;
+    left: 87%;  
+  }
+    
+  #fpfd {
+    position: absolute;
+    top: 28%;
+    left: 28%;
+  }
+
+  #divR {
+    position: absolute;
+    top: 28%;
+    left: 14%;
+  }
+
+  #divN {
+    position: absolute;
+    top: 79%;
+    left: 28%;
+  }
+
+  #kphi {
+    position: absolute;
+    top: 28%;
+    left: 42%;
+  }
+
+  #kvco {
+    position: absolute;
+    top: 28%;
+    left: 70%;
+  }

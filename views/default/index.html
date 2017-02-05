@@ -26,39 +26,31 @@
               OnClick="testFun()">test</button>
 
     <input type="string" class="form-control input-sm pll-form-input" id="fref" value="10 MHz"
-                            data-toggle="tooltip" title="reference frequency"
-                            style="position:absolute;top:62%;left:0.5%;"
-                                                                          onchange="onFrefChanged()">
+                            data-toggle="tooltip" title="reference frequency" onchange="onFrefChanged()">
 
     <input type="string" class="form-control input-sm pll-form-input" id="fout" value="1960 MHz"
-                            data-toggle="tooltip" title="output frequency"
-                            style="position:absolute;top:45%;left:86.5%;"
-                                                                          onchange="onFoutChanged()">
+                            data-toggle="tooltip" title="output frequency" onchange="onFoutChanged()">
 
     <input type="string" class="form-control input-sm pll-form-input" id="fpfd" value="50 kHz"
-                            data-toggle="tooltip" title="comparison frequency"
-                            style="position:absolute;top:28%;left:26.75%;"
-                                                                          onchange="onFpfdChanged()">
+                            data-toggle="tooltip" title="comparison frequency" onchange="onFpfdChanged()">
 
     <input type="number" class="form-control input-sm pll-form-input" id="divR" step="1" value=200
-                            data-toggle="tooltip" title="R divider"
-                            style="position:absolute;top:28%;left:13%;"
-                                                                          onchange="onRChanged()">
+                            data-toggle="tooltip" title="R divider" onchange="onRChanged()">
 
     <input type="number" class="form-control input-sm pll-form-input" id="divN" step="1" value=39200
-                            data-toggle="tooltip" title="N divider"
-                            style="position:absolute;top:79%;left:26.75%;"
-                                                                          onchange="onNChanged()">
+                            data-toggle="tooltip" title="N divider" onchange="onNChanged()">
     
     <input type="string" class="form-control input-sm pll-form-input" id="kphi" value="1 mA"
-                            data-toggle="tooltip" title="charge pump current"
-                            style="position:absolute;top:28%;left:40.5%;"
-                                                                          onchange="onKphiChanged()">
+                            data-toggle="tooltip" title="charge pump current" onchange="onKphiChanged()">
 
     <input type="string" class="form-control input-sm pll-form-input" id="kvco" value="60 MHz"
-                            data-toggle="tooltip" title="tuning sensitivity (Hz/V)"
-                            style="position:absolute;top:28%;left:68.75%;"
-                                                                          onchange="onKvcoChanged()">
+                            data-toggle="tooltip" title="tuning sensitivity (Hz/V)" onchange="onKvcoChanged()">
+
+    <label for="pllFom" id="fomLabel">PLL IC Figure-of-Merit:</label>
+    <input type="number" class="form-control input-sm pll-form-input" id="pllFom" value="-227" onchange="onFomChanged()">
+
+    <label for="pllFlicker" id="flickerLabel" >Pll Flicker:</label>
+    <input type="string" class="form-control input-sm" id="pllFlicker" value="-268" onchange="onFlickerChanged()">
 
   </div>
 
@@ -207,7 +199,7 @@
             <td contenteditable="true">-165</td>
         </table>
 
-        <div id="refPnGraph" class="svg-container phase-noise-plot-container">
+        <div id="refPnGraph" class="svg-container">
         </div>
 
       </div>
@@ -244,23 +236,12 @@
             <td contenteditable="true">-162</td>
         </table>
 
-        <div id="vcoPnGraph" class="svg-container phase-noise-plot-container">
+        <div id="vcoPnGraph" class="svg-container">
         </div>
 
       </div>
 
       <div id="totalPnPane" class="tab-pane fade in active">
-
-        <div id="pnIc" class="display">
-        <table class="phase-noise-table" id="pllIcPn">
-          <tr>
-            <th>PLL FoM</th>
-            <th>PLL Flicker</th>
-          <tr>
-            <td contenteditable="true">-227</td>
-            <td contenteditable="true">-268</td>
-          </tr>
-        </table>
 
       </div>
 

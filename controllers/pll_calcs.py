@@ -700,7 +700,7 @@ def simulatePll( fstart,
                  N,
                  R,
                  filt=None,
-                 coeffs=None):
+                 coeffs=None ):
     """ simulate an arbitrary phase-locked loop using either
     filter coefficients or component values. return 3 lists:
     f (frequencies), g_ol (open-loop gain), phases (open-loop phases)  
@@ -743,27 +743,32 @@ def simulatePll( fstart,
         a.append(0)    
     else:
         pass
-    # complex frequency variable
-    s = np.array(f)*2*np.pi*1j 
 
     # loop filter impedance
-    z = (1 + s*t2)/(s*(a[3]*s**3 + a[2]*s**2 + a[1]*s + a[0])) 
+    # z = (1 + s*t2)/(s*(a[3]*s**3 + a[2]*s**2 + a[1]*s + a[0])) 
+    z = calculateZ( f,  
+                    t2, 
+                    a[0], 
+                    a[1],
+                    a[2],
+                    a[3] )
 
     # G(s)
-    g = kphi*kvco*z/s
+    # g = kphi*kvco*z/s
+    g = calculateG( f, z, kphi, kvco )
 
     # # Open-loop gain 
     g_ol = g/N
-    g_ol_db = 10*np.log10(np.absolute(g_ol))
+    g_ol_db = 20*np.log10(np.absolute(g_ol))
     ph_ol = 180 + np.unwrap(np.angle(g_ol))*180/np.pi
 
     # # Closed-loop reference transfer gain
     cl_r = (1.0/R)*(g/(1+g/N))
-    cl_r_db = 10*np.log10(np.absolute(cl_r))
+    cl_r_db = 20*np.log10(np.absolute(cl_r))
 
     # # Closed-loop VCO transfer gain
     cl_vco = 1.0/(1+g/N)
-    cl_vco_db = 10*np.log10(np.absolute(cl_vco))
+    cl_vco_db = 20*np.log10(np.absolute(cl_vco))
 
     # convert gains and phases to lists
     # cannot return numpy array to javascript
@@ -777,6 +782,220 @@ def simulatePll( fstart,
     ref_cl.extend(cl_r_db)
     vco_cl.extend(cl_vco_db)
     return f, g, p, fz, pz, ref_cl, vco_cl
+
+@service.json
+def callSimulatePhaseNoise():
+    """
+    """
+
+    f =             request.vars.freqs
+    f =             map(float, f.split(','))
+
+    vcoPn =         request.vars.vcoPn
+    vcoPn =         map(float, vcoPn.split(','))
+
+    refPn =         request.vars.refPn
+    refPn =         map(float, refPn.split(','))
+
+    pllFom =        float(request.vars.pllFom)
+    pllFlicker =    float(request.vars.pllFlicker)
+    kphi =          float(request.vars.kphi)
+    kvco =          float(request.vars.kvco)
+    fpfd =          float(request.vars.fpfd)
+    N =             float(request.vars.N)
+    R =             float(request.vars.R)
+    flt_type =      request.vars.flt_type
+    c1 =            float(request.vars.c1)
+    c2 =            float(request.vars.c2)
+    c3 =            float(request.vars.c3)
+    c4 =            float(request.vars.c4)
+    r2 =            float(request.vars.r2)
+    r3 =            float(request.vars.r3)
+    r4 =            float(request.vars.r4)
+    flt =   {
+            'c1':c1,
+            'c2':c2,
+            'c3':c3,
+            'c4':c4,
+            'r2':r2,
+            'r3':r3,
+            'r4':r4,
+            'flt_type':flt_type
+            }
+
+    f, ref, vco, ic, flick, comp = simulatePhaseNoise( f,
+                                                       refPn,
+                                                       vcoPn,
+                                                       pllFom,
+                                                       pllFlicker,
+                                                       kphi,
+                                                       kvco,
+                                                       fpfd,
+                                                       N,
+                                                       R,
+                                                       filt=flt )
+     
+    d = { 'freqs':f,
+          'refPnOut':ref,
+          'vcoPnOut':vco,
+          'icPnOut': ic,
+          'icFlickerOut': flick,
+          'compositePn': comp
+        }
+    return response.json(d)
+
+def testSimulatePhaseNoise():
+    kphi = 5e-3
+    kvco = 60e6
+    N = 200  
+    R = 1  
+    fpfd = 10e6/R
+
+    flt = {
+            'c1':368e-12,
+            'c2':6.75e-9,
+            'c3':76.6e-12,
+            'c4':44.7e-12,
+            'r2':526,
+            'r3':1.35e3,
+            'r4':3.4e3,
+            'flt_type':"passive" 
+           }
+
+    f =         [ 10, 100, 1e3, 10e3, 100e3, 1e6, 10e6, 100e6 ]
+    refPnIn =   [ -138, -158, -163, -165, -165, -165, -165, -165 ]
+    vcoPnIn =   [ -10, -30, -60, -90, -120, -140, -160, -162 ]
+
+    pllFom =        -227
+    pllFlicker =    -268
+
+    f, refPn, vcoPn, icPn, icFlick, comp = simulatePhaseNoise( f,
+                                                               refPnIn,
+                                                               vcoPnIn,
+                                                               pllFom,
+                                                               pllFlicker,
+                                                               kphi,
+                                                               kvco,
+                                                               fpfd,
+                                                               N,
+                                                               R,
+                                                               filt=flt )
+
+    print(type(f))
+    print(type(refPn))
+    print(type(vcoPn))
+    print(type(icPn))
+    print(type(icFlick))
+    print(type(comp))
+
+    # fig, ax = plt.subplots()
+    # ax.semilogx(f,refPn,'r',label='ref')
+    # ax.semilogx(f,vcoPn,'b',label='vco')
+    # ax.semilogx(f,icPn,'g',label='pll')
+    # ax.semilogx(f,icFlick,'c',label='flick')
+    # ax.semilogx(f,comp,'k',linewidth=2,label='total')
+    # legend = ax.legend()
+    # plt.grid(True)
+    # plt.show()
+    return f, refPn, vcoPn, icPn, icFlick, comp
+
+def simulatePhaseNoise( f, 
+                        refPn,
+                        vcoPn,
+                        pllFom,
+                        pllFlicker,
+                        kphi,
+                        kvco,
+                        fpfd,
+                        N,
+                        R,
+                        filt=None,
+                        coeffs=None ):
+    """ simulate an arbitrary phase-locked loop using either
+    filter coefficients or component values. return 3 lists:
+    f (frequencies), g_ol (open-loop gain), phases (open-loop phases)  
+    """
+    if coeffs == None:
+        c1 = filt['c1']
+        c2 = filt['c2']
+        r2 = filt['r2']
+        if 'r3' not in filt.keys():
+            r3 = 0
+            c3 = 0
+        else:
+            c3 = filt['c3']
+            r3 = filt['r3']
+
+        if 'r4' not in filt.keys():
+            r4 = 0
+            c4 = 0
+        else:
+            c4 = filt['c4']
+            r4 = filt['r4']
+
+        coeffs = calculateCoefficients( c1=c1,
+                                        c2=c2,
+                                        c3=c3,
+                                        c4=c4,
+                                        r2=r2,
+                                        r3=r3,
+                                        r4=r4,
+                                        flt_type=filt['flt_type'])
+    a = coeffs
+    t2 = filt['r2']*filt['c2']
+    if len(a) == 2:
+        # 2nd order
+        a.append(0)    
+        a.append(0)    
+    elif len(a) == 3:
+        # 3rd order
+        a.append(0)    
+    else:
+        pass
+
+    # loop filter impedance
+    z = calculateZ( f,  
+                    t2, 
+                    a[0], 
+                    a[1],
+                    a[2],
+                    a[3] )
+
+    # G(s)
+    g = calculateG( f, z, kphi, kvco )
+
+    # # Closed-loop reference transfer gain
+    cl_r = (1.0/R)*(g/(1+g/N))
+    cl_r_db = 20*np.log10(np.absolute(cl_r))
+    refPnOut = refPn + cl_r_db
+    refPn = []
+    refPn.extend( refPnOut )
+
+    cl_ic = (g/(1+g/N))
+    cl_ic_db = 20*np.log10(np.absolute(cl_r))
+    icPnOut = pllFom + 10*np.log10(fpfd) + cl_ic_db
+    icPn = []
+    icPn.extend( icPnOut )
+
+    icFlickerOut = pllFlicker + 20*np.log10(fpfd) - 10*np.log10(f) + cl_ic_db
+    icFlick = []
+    icFlick.extend( icFlickerOut )
+
+    # # Closed-loop VCO transfer gain
+    cl_vco = 1.0/(1+g/N)
+    cl_vco_db = 20*np.log10(np.absolute(cl_vco))
+    vcoPnOut = vcoPn + cl_vco_db
+    vcoPn = []
+    vcoPn.extend( vcoPnOut )
+
+    compPn = []
+    for i in range(len(f)):
+        compPn.append(powerSum( [ refPnOut[i],
+                                  vcoPnOut[i],
+                                  icPnOut[i],
+                                  icFlickerOut[i] ] ))
+
+    return f, refPn, vcoPn, icPn, icFlick, compPn
 
 def calculateCoefficients( c1=0, 
                            c2=0, 
@@ -811,8 +1030,9 @@ def calculateZ( f,
     """ given the filter coefficients, return Z(s)
     """
     s = np.array(f)*2*np.pi*1j
-    z = (1 + s*t2)/(s*(a[3]*s**3 + a[2]*s**2 + a[1]*s + a[0]))
+    z = (1 + s*t2)/(s*(a3*s**3 + a2*s**2 + a1*s + a0))
     return z
+
 
 def calculateG(f, z, kphi, kvco):
     """ given the loop filter impedance, kphi and kvco, return G(s)
@@ -868,6 +1088,17 @@ def semilogXInterpolate( f, x, y ):
     lst = []
     lst.extend(pn)
     return lst 
+
+def powerSum( pdb_lst ):
+    """ take a list of powers in dBm, add them
+        in the linear domain and return the sum
+        in log
+    """
+    sum_lin = 0
+    for pdb in pdb_lst:
+        sum_lin += 10**(float(pdb)/10)*1e-3
+    return 10*np.log10(sum_lin/1e-3)
+
 
 @service.json
 def callGetInterpolatedPhaseNoise():
