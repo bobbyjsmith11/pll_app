@@ -19,6 +19,18 @@ window.onload = function() {
   // math.createUnit("GHZ/V", {definition: "1 GHz", aliases: ["Ghz/V", "GHz/V"]  } );
   // math.createUnit("THZ/V", {definition: "1 THz", aliases: ["Thz/V", "THz/V"]  } );
   
+  getFref();
+  getR();
+  getFpfd();
+  getN();
+  getFout();
+  getFc();
+  getKphi();
+  getKvco();
+  getPm();
+  getFom();
+  getFlicker();
+
   // synthPll();
   setFilterType();
   // document.getElementById("refPnTable").addEventListener('change', refTableChangedHandler)
@@ -36,6 +48,7 @@ window.onload = function() {
   vcoPhaseNoise = readVcoPhaseNoise();  // global variable
   vcoTableChangedHandler();
   graphVcoPhaseNoise();
+
 
 }
 
@@ -80,12 +93,19 @@ var loop_filter = { r2: 0,
                     type: 'passive',
                     order: 2 };
 
+function get_pll_properties () {
+
+  pll.fpfd = math.unit(document.getElementById("fpfd").value);
+  pll.fout = math.unit(document.getElementById("fout").value);
+  pll.N = math.unit(document.getElementById("fout").value);
+}
+
 
 function synthPll () {
   if ( (loop_filter.type == 'passive') && (loop_filter.order == 2) ) {
     solveComponents( loop_type='passive2', gamma=1.024 );
   } else if ( (loop_filter.type == 'passive') && (loop_filter.order == 3) ) {
-    solveComponents( loop_type='passive3', gamma=1.136 );
+    solveComponents( loop_type='passive3', gamma=1.005 );
   } else if ( (loop_filter.type == 'passive') && (loop_filter.order == 4) ) {
     solveComponents( loop_type='passive4', gamma=1.115 );
   } 
@@ -119,8 +139,8 @@ function simulatePll( ) {
               // console.log(data)
               if (PM_PLOT_PRESENT) {
                 updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
-                setPm(data.pzero);
-                setFc(data.fzero); 
+                // setPm(data.pzero);
+                // setFc(data.fzero); 
                 updateClosedLoopGraph( data.ref_cl , data.vco_cl, data.freqs );
               } else {
                 plotGainPhaseMargin( data.gains , data.phases, data.freqs );
@@ -465,7 +485,6 @@ function loadPll2PassiveForm() {
   document.getElementById("selFilterType").style.top = "0%";
   document.getElementById("selFilterType").style.left = "70%";
 
-
   // 1st 
   $("#c1").detach().appendTo(mydiv);
   document.getElementById("c1").style.display = "block";
@@ -603,6 +622,9 @@ function setFc(val) {
   document.getElementById("fc").value = math.unit(pll.fc,"Hz").format(3);
   
 }
+function getFc () {
+  pll.fc = math.unit(document.getElementById("fc").value).value;
+}
 
 
 /* set the global value for kphi and change the form display
@@ -614,7 +636,9 @@ function setKphi(val) {
   pll.kphi = val;
   document.getElementById("kphi").value = math.unit(pll.kphi,"A").toString();
 }
-
+function getKphi () {
+  pll.kphi = math.unit(document.getElementById("kphi").value).value;
+}
 /* set the global value for kvco and change the form display
  * this call is only made within program. argument
  * is not checked for validity
@@ -623,6 +647,9 @@ function setKphi(val) {
 function setKvco(val) {
   pll.kvco = val;
   document.getElementById("kvco").value = math.unit(pll.kvco,"Hz").toString();
+}
+function getKvco () {
+  pll.kvco = math.unit(document.getElementById("kvco").value).value;
 }
 
 /* set the global value for pm and change the form display
@@ -633,6 +660,10 @@ function setKvco(val) {
 function setPm(val) {
   pll.pm = val;
   document.getElementById("pm").value = math.unit(pll.pm,"deg").format(3);
+}
+function getPm () {
+  pll.pm = (math.unit(document.getElementById("pm").value).value)*180/math.PI;
+  
 }
 
 
@@ -645,6 +676,9 @@ function setFref(val) {
   pll.fref = val;
   document.getElementById("fref").value = math.unit(pll.fref,"Hz").toString();
 }
+function getFref () {
+  pll.fref = math.unit(document.getElementById("fref").value).value;
+}
 
 
 /* set the global value for fout and change the form display
@@ -656,7 +690,9 @@ function setFout(val) {
   pll.fout = val;
   document.getElementById("fout").value = math.unit(pll.fout,"Hz").toString();
 }
-
+function getFout() {
+  pll.fout = math.unit(document.getElementById("fout").value).value;
+}
 
 /* set the global value for fpfd and change the form display
  * this call is only made within program. argument
@@ -667,8 +703,9 @@ function setFpfd(val) {
   pll.fpfd = val;
   document.getElementById("fpfd").value = math.unit(pll.fpfd,"Hz").toString();
 }
-
-
+function getFpfd() {
+  pll.fpfd = math.unit(document.getElementById("fpfd").value).value;
+}
 /* set the global value for R and change the form display
  * this call is only made within program. argument
  * is not checked for validity
@@ -677,6 +714,9 @@ function setFpfd(val) {
 function setR(val) {
   pll.R = val
   document.getElementById("divR").value = val;
+}
+function getR () {
+  pll.R = Number(document.getElementById("divR").value);
 }
 
 /* set the global value for N and change the form display
@@ -687,6 +727,9 @@ function setR(val) {
 function setN(val) {
   pll.N = val
   document.getElementById("divN").value = val;
+}
+function getN () {
+  pll.N = Number(document.getElementById("divN").value);
 }
 
 function setT2(val) {
@@ -906,24 +949,6 @@ function onFrefChanged() {
   synthPll();
 }
 
-/* User changes Fout. Calculate new value
- * for N and set N
- * */
-function onFoutChanged() {
-  var val_str = document.getElementById("fout").value;
-  var val_good = check_unit( val_str, "Hz", "fout" );
-  if (val_good) {
-    setFout( math.unit( document.getElementById("fout").value ).value ); 
-  } else {
-    document.getElementById("fout").value = math.unit(pll.fout,"Hz").toString();
-    return;
-  }
-
-  N = pll.fout/pll.fpfd;
-  setN(N);
-  synthPll();
-}
-
 /* User changes Fpfd. Calculate new value for R
  * and N and set them both
  */
@@ -1053,6 +1078,10 @@ function onFomChanged() {
 
   synthPll();
 }
+function getFom () {
+  pll.fom = Number(document.getElementById("pllFom").value);
+}
+
 
 /* User changes Pll flicker noise changed
  * */
@@ -1060,6 +1089,9 @@ function onFlickerChanged() {
   pll.flicker = parseFloat( document.getElementById("pllFlicker").value );
 
   synthPll();
+}
+function getFlicker () {
+  pll.flicker = Number(document.getElementById("pllFlicker").value);
 }
 
 /* checks the value of the user input for proper formatting against
@@ -1207,38 +1239,47 @@ function checkForEnter( e ) {
 
 function testFun() {
 
-  my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
-  dat = "freqs=" + refPhaseNoise.freqs 
-        + "&refPn=" + refPhaseNoise.pns
-        + "&vcoPn=" + vcoPhaseNoise.pns
-        + "&pllFom=" + pll.fom
-        + "&pllFlicker=" + pll.flicker
-        + "&kphi=" + pll.kphi
-        + "&kvco=" + pll.kvco
-        + "&fpfd=" + pll.fpfd
-        + "&N=" + pll.N
-        + "&R=" + pll.R
-        + "&flt_type=" + loop_filter.type
-        + "&c1=" + loop_filter.c1
-        + "&c2=" + loop_filter.c2
-        + "&r2=" + loop_filter.r2
-        + "&c3=" + loop_filter.c3 
-        + "&c4=" + loop_filter.c4 
-        + "&r3=" + loop_filter.r3 
-        + "&r4=" + loop_filter.r4;
+  // pll.fpfd = math.unit(document.getElementById("fpfd").value);
+  // pll.fout = math.unit(document.getElementById("fout").value);
+  // pll.N = document.getElementById("divN").value;
+  console.log(math.unit(document.getElementById("fpfd").value).value);
+  console.log(math.unit(document.getElementById("fout").value).value);
+  console.log(Number(document.getElementById("divN").value));
+  console.log(Number(document.getElementById("divR").value));
+  
 
-  $.ajax( {
-            type: "GET",
-            url: my_url,
-            datatype: 'json',
-            async: true,
-            data: dat,
-            success: function (data) {
-              console.log(data)
-            },
-            error: function (result) {
-            }
-  });
+  // my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
+  // dat = "freqs=" + refPhaseNoise.freqs 
+  //       + "&refPn=" + refPhaseNoise.pns
+  //       + "&vcoPn=" + vcoPhaseNoise.pns
+  //       + "&pllFom=" + pll.fom
+  //       + "&pllFlicker=" + pll.flicker
+  //       + "&kphi=" + pll.kphi
+  //       + "&kvco=" + pll.kvco
+  //       + "&fpfd=" + pll.fpfd
+  //       + "&N=" + pll.N
+  //       + "&R=" + pll.R
+  //       + "&flt_type=" + loop_filter.type
+  //       + "&c1=" + loop_filter.c1
+  //       + "&c2=" + loop_filter.c2
+  //       + "&r2=" + loop_filter.r2
+  //       + "&c3=" + loop_filter.c3 
+  //       + "&c4=" + loop_filter.c4 
+  //       + "&r3=" + loop_filter.r3 
+  //       + "&r4=" + loop_filter.r4;
+
+  // $.ajax( {
+  //           type: "GET",
+  //           url: my_url,
+  //           datatype: 'json',
+  //           async: true,
+  //           data: dat,
+  //           success: function (data) {
+  //             console.log(data)
+  //           },
+  //           error: function (result) {
+  //           }
+  // });
 
 }
 

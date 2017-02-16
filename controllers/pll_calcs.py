@@ -73,6 +73,25 @@ def solveForComponents( ):
         d = pll.calc_components()
     return response.json(d)
 
+def test2ndOrderPassive(gamma=1.024):
+    fc = 100e3
+    pm = 45.0
+    gamma = gamma
+    kphi = 4.69e-3
+    kvco = 10e6
+    fout = 2000e6
+    fpfd = 10e6 
+    N = fout/fpfd
+    
+    pll = PllSecondOrderPassive( fc,
+                                 pm,
+                                 kphi,
+                                 kvco,
+                                 N,
+                                 gamma=gamma )
+    
+    return pll.calc_components()
+
 class PllSecondOrderPassive( object ):
     def __init__(self,
                  fc,
@@ -215,6 +234,27 @@ class PllSecondOrderPassive( object ):
         """
         return c1*c2*r2
 
+def test3rdOrderPassive(gamma=1.024):
+    fc = 100e3
+    pm = 45.0
+    gamma = gamma
+    kphi = 4.69e-3
+    kvco = 10e6
+    fout = 2000e6
+    fpfd = 10e6 
+    N = fout/fpfd
+    
+    pll = PllSecondOrderPassive( fc,
+                                 pm,
+                                 kphi,
+                                 kvco,
+                                 N,
+                                 gamma=gamma,
+                                 t31=0.6)
+    
+    return pll.calc_components()
+
+
 class PllThirdOrderPassive( PllSecondOrderPassive ):
     def __init__(self,
                  fc,
@@ -223,7 +263,7 @@ class PllThirdOrderPassive( PllSecondOrderPassive ):
                  kvco,
                  N,
                  gamma=1.136,
-                 t31=0.6):
+                 t31=0.4):
         """
         :Parameters:
         fc (float) - cutoff frequency in Hz
@@ -759,8 +799,9 @@ def simulatePll( fstart,
 
     # # Open-loop gain 
     g_ol = g/N
-    g_ol_db = 20*np.log10(np.absolute(g_ol))
+    g_ol_db = 10*np.log10(np.absolute(g_ol))
     ph_ol = 180 + np.unwrap(np.angle(g_ol))*180/np.pi
+    # ph_ol = np.unwrap(np.angle(g_ol))*180/np.pi
 
     # # Closed-loop reference transfer gain
     cl_r = (1.0/R)*(g/(1+g/N))

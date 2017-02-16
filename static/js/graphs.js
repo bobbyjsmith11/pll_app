@@ -35,26 +35,29 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     var fstop = linedata[linedata.length - 1].x;
 
     // X scale will fit all values within pixels 0-w
-    x = d3.scale.log()
-              .range([0, w]);
+    x_ol = d3.scale.log()
+              .range([0, w])
+              .domain([fstart, fstop]);
 
     // X scale will fit all values within pixels h-0 (note, scale is inverted
     // so bigger is up) 
-    y = d3.scale.linear()
-                .range([h, 0]);
+    y_ol = d3.scale.linear()
+                .range([h, 0])
+                .domain(d3.extent(linedata, function(d) { return d.y; }));
 
-    y2 = d3.scale.linear()
-                .range([h, 0]);
+    y2_ol = d3.scale.linear()
+                .range([h, 0])
+                .domain(d3.extent(linedata, function(d) { return d.p; }));
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
                             //console.log("plotting x point at x = " + d.x );
-                            return x(d.x); } )  
+                            return x_ol(d.x); } )  
                           .y( function(d) { 
                             //console.log("plotting y point at y = " + d.y );
-                            return y(d.y); } )
+                            return y_ol(d.y); } )
                           .interpolate("linear");
 
     // Create the line function. Note the function is returning the scaled
@@ -62,52 +65,45 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     var linefunction2 = d3.svg.line() 
                           .x( function(d) { 
                             //console.log("plotting x point at x = " + d.x );
-                            return x(d.x); } )  
+                            return x_ol(d.x); } )  
                           .y( function(d) { 
                             //console.log("plotting y point at y = " + d.y );
-                            return y2(d.p); } )
+                            return y2_ol(d.p); } )
                           .interpolate("linear");
-
-    // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
-
-   	// automatically determining max range can work something like this
-   	// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
-    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
 
     // create xAxis
     
     xAxisMinor = d3.svg.axis()
-                  .scale(x)
-                  .orient("bottom")
-                  .tickFormat( "" )
-                  .tickSize(-h);
+              .scale(x_ol)
+              .orient("bottom")
+              .tickFormat( "" )
+              .tickSize(-h);
 
     xAxisMajor = d3.svg.axis()
-                  .scale(x)
-                  .orient("bottom")
-                  .tickValues([10,100,1000,10000,100000,1000000,10000000])
-                  .tickFormat( d3.format("s") )
-                  .tickSize(-h);
+              .scale(x_ol)
+              .orient("bottom")
+              .tickValues([10,100,1000,10000,100000,1000000,10000000])
+              .tickFormat( d3.format("s") )
+              .tickSize(-h);
 
     // create left and right yAxes
     yAxisLeft = d3.svg.axis()
-                      .scale(y)
-                      .orient("left")
-                      .ticks(6);
+                  .scale(y_ol)
+                  .orient("left")
+                  .ticks(6);
+
     yAxisZeroCross = d3.svg.axis()
-                      .scale(y)
-                      .orient("left")
-                      .ticks(1)
-                      .tickSize(-w)
-                      .tickFormat( "" )
-                      .tickValues([0]);
+                  .scale(y_ol)
+                  .orient("left")
+                  .ticks(1)
+                  .tickSize(-w)
+                  .tickFormat( "" )
+                  .tickValues([0]);
 
     yAxisRight = d3.svg.axis()
-                      .scale(y2)
-                      .orient("right")
-                      .ticks(4);
+                  .scale(y2_ol)
+                  .orient("right")
+                  .ticks(4);
 
     // Add the y-axis to the left
     graph.append("svg:g")
@@ -163,7 +159,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     graph.append("text")
           .attr("text-anchor", "middle")
           // .attr("transform", "translate("+ (w+m[1]/2) +","+ (h/2)+")rotate(-90)")
-          .attr("transform", "translate("+ (w+m[1]/2 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
+          .attr("transform", "translate("+ (w+m[1]/1.5 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
           .attr("fill", "red")
           .text("Phase Margin in degrees");
 
@@ -215,37 +211,38 @@ function updateGainPhaseMarginGraph (gdb, phi, freq, dur=500) {
     for ( i=0; i<freq.length; i++ ) {
       linedata.push( { "x": freq[i],   "y": gdb[i],   "p": phi[i]} );
     }
-    // X scale will fit all values within pixels 0-w
-    var x = d3.scale.log()
-              .range([0, w]);
+    // // X scale will fit all values within pixels 0-w
+    // var x = d3.scale.log()
+    //           .range([0, w]);
 
     var fstart = linedata[0].x;
     var fstop = linedata[linedata.length - 1].x;
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_ol.domain([fstart, fstop]);
 
    	// // automatically determining max range can work something like this
    	// // var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
-    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
+    y_ol.domain(d3.extent(linedata, function(d) { return d.y; }));
+
+    y2_ol.domain(d3.extent(linedata, function(d) { return d.p; }));
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_ol(d.x); } )  
                           .y( function(d) { 
-                            return y(d.y); } )
+                            return y_ol(d.y); } )
                           .interpolate("linear");
 
     // Create the line function. Note the function is returning the scaled
     // value. For example y(d.y) means the x-scaled value of our data d.y.
     var linefunction2 = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_ol(d.x); } )  
                           .y( function(d) { 
-                            return y2(d.p); } )
+                            return y2_ol(d.p); } )
                           .interpolate("linear");
 
     var graph = d3.select("#pmGraph").transition();
@@ -321,66 +318,66 @@ function plotClosedLoop ( clRef, clVco, freq) {
     var fstop = linedata[linedata.length - 1].x;
 
     // X scale will fit all values within pixels 0-w
-    x = d3.scale.log()
+    x_cl = d3.scale.log()
               .range([0, w]);
 
     // X scale will fit all values within pixels h-0 (note, scale is inverted
     // so bigger is up) 
-    y = d3.scale.linear()
+    y_cl = d3.scale.linear()
                 .range([h, 0]);
 
-    y2 = d3.scale.linear()
+    y2_cl = d3.scale.linear()
                 .range([h, 0]);
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_cl(d.x); } )  
                           .y( function(d) { 
-                            return y(d.y); } )
+                            return y_cl(d.y); } )
                           .interpolate("linear");
 
     // Create the line function. Note the function is returning the scaled
     // value. For example y(d.y) means the x-scaled value of our data d.y.
     var linefunction2 = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_cl(d.x); } )  
                           .y( function(d) { 
-                            return y2(d.p); } )
+                            return y2_cl(d.p); } )
                           .interpolate("linear");
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_cl.domain([fstart, fstop]);
 
    	// automatically determining max range can work something like this
    	// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
-    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
+    y_cl.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y2_cl.domain(d3.extent(linedata, function(d) { return d.p; }));
 
     // create xAxis
     
-    xAxisMinor = d3.svg.axis()
-                  .scale(x)
+    xAxisMinorCl = d3.svg.axis()
+                  .scale(x_cl)
                   .orient("bottom")
                   .tickFormat( "" )
                   .tickSize(-h);
 
-    xAxisMajor = d3.svg.axis()
-                  .scale(x)
+    xAxisMajorCl = d3.svg.axis()
+                  .scale(x_cl)
                   .orient("bottom")
                   .tickValues([10,100,1000,10000,100000,1000000,10000000])
                   .tickFormat( d3.format("s") )
                   .tickSize(-h);
 
     // create left and right yAxes
-    yAxisLeft = d3.svg.axis()
-                      .scale(y)
+    yAxisLeftCl = d3.svg.axis()
+                      .scale(y_cl)
                       .orient("left")
                       .ticks(6);
 
-    yAxisRight = d3.svg.axis()
-                      .scale(y2)
+    yAxisRightCl = d3.svg.axis()
+                      .scale(y2_cl)
                       .orient("right")
                       .ticks(4);
 
@@ -424,7 +421,7 @@ function plotClosedLoop ( clRef, clVco, freq) {
     // add the left y axis label
     graph.append("text")
           .attr("text-anchor", "middle")
-          .attr("transform", "translate("+ (w+m[1]/2 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
+          .attr("transform", "translate("+ (w+m[1]/1.5 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
           .attr("fill", "red")
           .text("VCO Transfer Gain (dB)");
 
@@ -475,36 +472,36 @@ function updateClosedLoopGraph (clRef, clVco, freq, dur=500) {
       linedata.push( { "x": freq[i],   "y": clRef[i],   "p": clVco[i]} );
     }
     // X scale will fit all values within pixels 0-w
-    var x = d3.scale.log()
-              .range([0, w]);
+    // var x = d3.scale.log()
+    //           .range([0, w]);
 
     var fstart = linedata[0].x;
     var fstop = linedata[linedata.length - 1].x;
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_cl.domain([fstart, fstop]);
 
    	// // automatically determining max range can work something like this
    	// // var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
-    y2.domain(d3.extent(linedata, function(d) { return d.p; }));
+    y_cl.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y2_cl.domain(d3.extent(linedata, function(d) { return d.p; }));
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_cl(d.x); } )  
                           .y( function(d) { 
-                            return y(d.y); } )
+                            return y_cl(d.y); } )
                           .interpolate("linear");
 
     // Create the line function. Note the function is returning the scaled
     // value. For example y(d.y) means the x-scaled value of our data d.y.
     var linefunction2 = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_cl(d.x); } )  
                           .y( function(d) { 
-                            return y2(d.p); } )
+                            return y2_cl(d.p); } )
                           .interpolate("linear");
 
     var graph = d3.select("#clGraph").transition();
@@ -512,22 +509,22 @@ function updateClosedLoopGraph (clRef, clVco, freq, dur=500) {
     graph.select("#xAxisMinor")
             .transition()
             .duration(dur)
-            .call(xAxisMinor);
+            .call(xAxisMinorCl);
 
     graph.select("#xAxisMajor")
             .transition()
             .duration(dur)
-            .call(xAxisMajor);
+            .call(xAxisMajorCl);
 
     graph.select("#yAxisClRef")
             .transition()
             .duration(dur)
-            .call(yAxisLeft);
+            .call(yAxisLeftCl);
 
     graph.select("#yAxisClVco")
             .transition()
             .duration(dur)
-            .call(yAxisRight);
+            .call(yAxisRightCl);
     
     graph.select("#cl_ref")
             .duration(dur)
@@ -573,12 +570,12 @@ function plotReferencePhaseNoise ( pn, freq) {
     var fstop = linedata[linedata.length - 1].x;
 
     // X scale will fit all values within pixels 0-w
-    x = d3.scale.log()
+    x_ref = d3.scale.log()
               .range([0, w]);
 
     // X scale will fit all values within pixels h-0 (note, scale is inverted
     // so bigger is up) 
-    y = d3.scale.linear()
+    y_ref = d3.scale.linear()
                 .range([h, 0]);
 
     // Create the line function. Note the function is returning the scaled
@@ -586,48 +583,48 @@ function plotReferencePhaseNoise ( pn, freq) {
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
                             //console.log("plotting x point at x = " + d.x );
-                            return x(d.x); } )  
+                            return x_ref(d.x); } )  
                           .y( function(d) { 
                             //console.log("plotting y point at y = " + d.y );
-                            return y(d.y); } )
+                            return y_ref(d.y); } )
                           .interpolate("linear");
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_ref.domain([fstart, fstop]);
 
    	// automatically determining max range can work something like this
    	// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y_ref.domain(d3.extent(linedata, function(d) { return d.y; }));
 
     // create xAxis
     
-    xAxisMinor = d3.svg.axis()
-                  .scale(x)
+    xAxisMinorRef = d3.svg.axis()
+                  .scale(x_ref)
                   .orient("bottom")
                   .tickFormat( "" )
                   .tickSize(-h);
 
-    xAxisMajor = d3.svg.axis()
-                  .scale(x)
+    xAxisMajorRef = d3.svg.axis()
+                  .scale(x_ref)
                   .orient("bottom")
                   .tickValues([10,100,1000,10000,100000,1000000,10000000])
                   .tickFormat( d3.format("s") )
                   .tickSize(-h);
 
     // create left and right yAxes
-    yAxisLeft = d3.svg.axis()
-                      .scale(y)
+    yAxisLeftRef = d3.svg.axis()
+                      .scale(y_ref)
                       .orient("left")
                       .ticks(6);
 
     // Add the y-axis to the left
     graph.append("svg:g")
           .attr("class", "y axis")
-          .attr("id", "yAxisLeft")
+          .attr("id", "yAxisLeftRef")
           .style("fill","steelblue")
           // .attr("transform", "translate(0,0)")
           .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
-          .call(yAxisLeft);
+          .call(yAxisLeftRef);
 
     // add the graph title
     graph.append("text")
@@ -654,18 +651,18 @@ function plotReferencePhaseNoise ( pn, freq) {
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMinor")
+          .attr("id", "xAxisMinorRef")
           // .attr("transform", "translate(0," + h + ")")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
-          .call(xAxisMinor)
+          .call(xAxisMinorRef)
             .classed("minor", true);
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMajor")
+          .attr("id", "xAxisMajorRef")
           // .attr("transform", "translate(0," + h + ")")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
-          .call(xAxisMajor);
+          .call(xAxisMajorRef);
 
     // Add the line by appending an svg:path element with the data line we created above
     // do this AFTER the axes above so that the line is above the tick-lines
@@ -693,44 +690,44 @@ function updateReferencePhaseNoise(pns, freq, dur=500) {
       linedata.push( { "x": freq[i],   "y": pns[i], } );
     }
     // X scale will fit all values within pixels 0-w
-    var x = d3.scale.log()
-              .range([0, w]);
+    // var x = d3.scale.log()
+    //           .range([0, w]);
 
     var fstart = linedata[0].x;
     var fstop = linedata[linedata.length - 1].x;
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_ref.domain([fstart, fstop]);
 
    	// // automatically determining max range can work something like this
    	// // var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y_ref.domain(d3.extent(linedata, function(d) { return d.y; }));
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_ref(d.x); } )  
                           .y( function(d) { 
-                            return y(d.y); } )
+                            return y_ref(d.y); } )
                           .interpolate("linear");
 
     var graph = d3.select("#refPnGraph").transition();
 
-    graph.select("#xAxisMinor")
+    graph.select("#xAxisMinorRef")
             .transition()
             .duration(dur)
-            .call(xAxisMinor);
+            .call(xAxisMinorRef);
 
-    graph.select("#xAxisMajor")
+    graph.select("#xAxisMajorRef")
             .transition()
             .duration(dur)
-            .call(xAxisMajor);
+            .call(xAxisMajorRef);
 
-    graph.select("#yAxisLeft")
+    graph.select("#yAxisLeftRef")
             .transition()
             .duration(dur)
-            .call(yAxisLeft);
+            .call(yAxisLeftRef);
 
     graph.select("#ref_pn")
             .duration(dur)
@@ -775,12 +772,12 @@ function plotVcoPhaseNoise ( pn, freq) {
     var fstop = linedata[linedata.length - 1].x;
 
     // X scale will fit all values within pixels 0-w
-    x = d3.scale.log()
+    x_vco = d3.scale.log()
               .range([0, w]);
 
     // X scale will fit all values within pixels h-0 (note, scale is inverted
     // so bigger is up) 
-    y = d3.scale.linear()
+    y_vco = d3.scale.linear()
                 .range([h, 0]);
 
     // Create the line function. Note the function is returning the scaled
@@ -788,47 +785,47 @@ function plotVcoPhaseNoise ( pn, freq) {
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
                             //console.log("plotting x point at x = " + d.x );
-                            return x(d.x); } )  
+                            return x_vco(d.x); } )  
                           .y( function(d) { 
                             //console.log("plotting y point at y = " + d.y );
-                            return y(d.y); } )
+                            return y_vco(d.y); } )
                           .interpolate("linear");
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_vco.domain([fstart, fstop]);
 
    	// automatically determining max range can work something like this
    	// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y_vco.domain(d3.extent(linedata, function(d) { return d.y; }));
 
     // create xAxis
     
-    xAxisMinor = d3.svg.axis()
-                  .scale(x)
+    xAxisMinorVco = d3.svg.axis()
+                  .scale(x_vco)
                   .orient("bottom")
                   .tickFormat( "" )
                   .tickSize(-h);
 
-    xAxisMajor = d3.svg.axis()
-                  .scale(x)
+    xAxisMajorVco = d3.svg.axis()
+                  .scale(x_vco)
                   .orient("bottom")
                   .tickValues([10,100,1000,10000,100000,1000000,10000000])
                   .tickFormat( d3.format("s") )
                   .tickSize(-h);
 
     // create left and right yAxes
-    yAxisLeft = d3.svg.axis()
-                      .scale(y)
+    yAxisLeftVco = d3.svg.axis()
+                      .scale(y_vco)
                       .orient("left")
                       .ticks(6);
 
     // Add the y-axis to the left
     graph.append("svg:g")
           .attr("class", "y axis")
-          .attr("id", "yAxisLeft")
+          .attr("id", "yAxisLeftVco")
           .style("fill","steelblue")
           .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
-          .call(yAxisLeft);
+          .call(yAxisLeftVco);
 
     // add the graph title
     graph.append("text")
@@ -852,17 +849,17 @@ function plotVcoPhaseNoise ( pn, freq) {
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMinor")
+          .attr("id", "xAxisMinorVco")
           // .attr("transform", "translate(0," + h + ")")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
-          .call(xAxisMinor)
+          .call(xAxisMinorVco)
             .classed("minor", true);
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMajor")
+          .attr("id", "xAxisMajorVco")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
-          .call(xAxisMajor);
+          .call(xAxisMajorVco);
 
     // Add the line by appending an svg:path element with the data line we created above
     // do this AFTER the axes above so that the line is above the tick-lines
@@ -890,44 +887,44 @@ function updateVcoPhaseNoise(pns, freq, dur=500) {
       linedata.push( { "x": freq[i],   "y": pns[i], } );
     }
     // X scale will fit all values within pixels 0-w
-    var x = d3.scale.log()
-              .range([0, w]);
+    // var x = d3.scale.log()
+    //           .range([0, w]);
 
     var fstart = linedata[0].x;
     var fstop = linedata[linedata.length - 1].x;
 
     // set the domain for our x-axis (frequency)
-    x.domain([fstart, fstop]);
+    x_vco.domain([fstart, fstop]);
 
    	// // automatically determining max range can work something like this
    	// // var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-    y.domain(d3.extent(linedata, function(d) { return d.y; }));
+    y_vco.domain(d3.extent(linedata, function(d) { return d.y; }));
 
     // Create the line function. Note the function is returning the scaled
     // value. For example x(d.x) means the x-scaled value of our data d.x.
     var linefunction = d3.svg.line() 
                           .x( function(d) { 
-                            return x(d.x); } )  
+                            return x_vco(d.x); } )  
                           .y( function(d) { 
-                            return y(d.y); } )
+                            return y_vco(d.y); } )
                           .interpolate("linear");
 
     var graph = d3.select("#vcoPnGraph").transition();
 
-    graph.select("#xAxisMinor")
+    graph.select("#xAxisMinorVco")
             .transition()
             .duration(dur)
-            .call(xAxisMinor);
+            .call(xAxisMinorVco);
 
-    graph.select("#xAxisMajor")
+    graph.select("#xAxisMajorVco")
             .transition()
             .duration(dur)
-            .call(xAxisMajor);
+            .call(xAxisMajorVco);
     
-    graph.select("#yAxisLeft")
+    graph.select("#yAxisLeftVco")
             .transition()
             .duration(dur)
-            .call(yAxisLeft);
+            .call(yAxisLeftVco);
 
     graph.select("#vco_pn")
             .duration(dur)
