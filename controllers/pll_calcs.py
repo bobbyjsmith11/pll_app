@@ -9,7 +9,10 @@ from gluon.tools import Service
 service = Service(globals())
 
 import numpy as np
-# import matplotlib.pylab as plt
+import matplotlib.pylab as plt
+from scipy.optimize import curve_fit
+from scipy.interpolate import interp1d
+from scipy.signal import savgol_filter
 
 def call():
     """
@@ -864,7 +867,7 @@ def callSimulatePhaseNoise():
             'flt_type':flt_type
             }
 
-    f, ref, vco, ic, flick, comp = simulatePhaseNoise( f,
+    f, ref, vco, ic, flick, comp = simulatePhaseNoise2( f,
                                                        refPn,
                                                        vcoPn,
                                                        pllFom,
@@ -922,23 +925,213 @@ def testSimulatePhaseNoise():
                                                                R,
                                                                filt=flt )
 
-    print(type(f))
-    print(type(refPn))
-    print(type(vcoPn))
-    print(type(icPn))
-    print(type(icFlick))
-    print(type(comp))
+    # print(type(f))
+    # print(type(refPn))
+    # print(type(vcoPn))
+    # print(type(icPn))
+    # print(type(icFlick))
+    # print(type(comp))
 
-    # fig, ax = plt.subplots()
-    # ax.semilogx(f,refPn,'r',label='ref')
-    # ax.semilogx(f,vcoPn,'b',label='vco')
-    # ax.semilogx(f,icPn,'g',label='pll')
-    # ax.semilogx(f,icFlick,'c',label='flick')
-    # ax.semilogx(f,comp,'k',linewidth=2,label='total')
-    # legend = ax.legend()
-    # plt.grid(True)
-    # plt.show()
+    fig, ax = plt.subplots()
+    ax.semilogx(f,refPn,'r',label='ref')
+    ax.semilogx(f,vcoPn,'b',label='vco')
+    ax.semilogx(f,icPn,'g',label='pll')
+    ax.semilogx(f,icFlick,'c',label='flick')
+    ax.semilogx(f,comp,'k',linewidth=2,label='total')
+    legend = ax.legend()
+    plt.grid(True)
+    plt.show()
     return f, refPn, vcoPn, icPn, icFlick, comp
+
+def test_smoothed_curve( ):
+    f =         [ 10, 100, 1e3, 10e3, 100e3, 1e6, 10e6, 100e6 ]
+    refPnIn =   [ -138, -158, -163, -165, -165, -165, -165, -165 ]
+    vcoPnIn =   [ -10, -30, -60, -90, -120, -140, -160, -162 ]
+    freq,refPn = semilogXInterpolate2(f,refPnIn)
+    freq,vcoPn = semilogXInterpolate2(f,vcoPnIn)
+
+    # plot results
+    fig, ax = plt.subplots()
+    ax.semilogx(freq,refPn,'r',label='pn')
+    ax.semilogx(freq,vcoPn,'r',label='pn')
+    plt.grid(True)
+    plt.show()
+    return freq, refPn, vcoPn 
+
+def semilogXInterpolate2( f, y, num_pts=1000 ):
+    x = np.log10(np.array(f))
+    xx = np.linspace(min(x), max(x), num_pts)
+
+    itp = interp1d(x,y, kind='linear')
+    window_size, poly_order = 151, 3
+    yy_sg = savgol_filter(itp(xx), window_size, poly_order)
+    x_log = 10**(xx)
+
+    xxx = []
+    xxx.extend(x_log)
+    yyy = []
+    yyy.extend(yy_sg)
+    return xxx, yyy 
+
+def testSimulatePhaseNoise2():
+    kphi = 5e-3
+    kvco = 60e6
+    N = 200  
+    R = 1  
+    fpfd = 10e6/R
+
+    flt = {
+            'c1':368e-12,
+            'c2':6.75e-9,
+            'c3':76.6e-12,
+            'c4':44.7e-12,
+            'r2':526,
+            'r3':1.35e3,
+            'r4':3.4e3,
+            'flt_type':"passive" 
+           }
+
+    f =         [ 10, 100, 1e3, 10e3, 100e3, 1e6, 10e6, 100e6 ]
+    refPnIn =   [ -138, -158, -163, -165, -165, -165, -165, -165 ]
+    vcoPnIn =   [ -10, -30, -60, -90, -120, -140, -160, -162 ]
+
+    pllFom =        -227
+    pllFlicker =    -268
+
+    f, refPn, vcoPn, icPn, icFlick, comp = simulatePhaseNoise2( f,
+                                                               refPnIn,
+                                                               vcoPnIn,
+                                                               pllFom,
+                                                               pllFlicker,
+                                                               kphi,
+                                                               kvco,
+                                                               fpfd,
+                                                               N,
+                                                               R,
+                                                               filt=flt )
+
+    # print(type(f))
+    # print(type(refPn))
+    # print(type(vcoPn))
+    # print(type(icPn))
+    # print(type(icFlick))
+    # print(type(comp))
+
+    fig, ax = plt.subplots()
+    ax.semilogx(f,refPn,'r',label='ref')
+    ax.semilogx(f,vcoPn,'b',label='vco')
+    ax.semilogx(f,icPn,'g',label='pll')
+    ax.semilogx(f,icFlick,'c',label='flick')
+    ax.semilogx(f,comp,'k',linewidth=2,label='total')
+    legend = ax.legend()
+    plt.grid(True)
+    plt.show()
+    return f, refPn, vcoPn, icPn, icFlick, comp
+
+def simulatePhaseNoise2( f, 
+                        refPn,
+                        vcoPn,
+                        pllFom,
+                        pllFlicker,
+                        kphi,
+                        kvco,
+                        fpfd,
+                        N,
+                        R,
+                        filt=None,
+                        coeffs=None,
+                        numPts=1000 ):
+    """ simulate an arbitrary phase-locked loop using either
+    filter coefficients or component values. return 3 lists:
+    f (frequencies), g_ol (open-loop gain), phases (open-loop phases)  
+    """
+    if coeffs == None:
+        c1 = filt['c1']
+        c2 = filt['c2']
+        r2 = filt['r2']
+        if 'r3' not in filt.keys():
+            r3 = 0
+            c3 = 0
+        else:
+            c3 = filt['c3']
+            r3 = filt['r3']
+
+        if 'r4' not in filt.keys():
+            r4 = 0
+            c4 = 0
+        else:
+            c4 = filt['c4']
+            r4 = filt['r4']
+
+        coeffs = calculateCoefficients( c1=c1,
+                                        c2=c2,
+                                        c3=c3,
+                                        c4=c4,
+                                        r2=r2,
+                                        r3=r3,
+                                        r4=r4,
+                                        flt_type=filt['flt_type'])
+    a = coeffs
+    t2 = filt['r2']*filt['c2']
+    if len(a) == 2:
+        # 2nd order
+        a.append(0)    
+        a.append(0)    
+    elif len(a) == 3:
+        # 3rd order
+        a.append(0)    
+    else:
+        pass
+
+    # get smoothed curves for each phase noise component
+
+    freq, refPn = semilogXInterpolate2( f, refPn, num_pts=numPts )
+    freq, vcoPn = semilogXInterpolate2( f, vcoPn, num_pts=numPts )
+
+    # loop filter impedance
+    z = calculateZ( freq,  
+                    t2, 
+                    a[0], 
+                    a[1],
+                    a[2],
+                    a[3] )
+
+    # G(s)
+    g = calculateG( freq, z, kphi, kvco )
+
+    # # Closed-loop reference transfer gain
+    cl_r = (1.0/R)*(g/(1+g/N))
+    cl_r_db = 20*np.log10(np.absolute(cl_r))
+    refPnOut = refPn + cl_r_db
+    refPn = []
+    refPn.extend( refPnOut )
+
+    cl_ic = (g/(1+g/N))
+    cl_ic_db = 20*np.log10(np.absolute(cl_r))
+    icPnOut = pllFom + 10*np.log10(fpfd) + cl_ic_db
+    icPn = []
+    icPn.extend( icPnOut )
+
+    icFlickerOut = pllFlicker + 20*np.log10(fpfd) - 10*np.log10(freq) + cl_ic_db
+    icFlick = []
+    icFlick.extend( icFlickerOut )
+
+    # # Closed-loop VCO transfer gain
+    cl_vco = 1.0/(1+g/N)
+    cl_vco_db = 20*np.log10(np.absolute(cl_vco))
+    vcoPnOut = vcoPn + cl_vco_db
+    vcoPn = []
+    vcoPn.extend( vcoPnOut )
+
+    compPn = []
+    for i in range(len(freq)):
+        compPn.append(powerSum( [ refPnOut[i],
+                                  vcoPnOut[i],
+                                  icPnOut[i],
+                                  icFlickerOut[i] ] ))
+
+    return freq, refPn, vcoPn, icPn, icFlick, compPn
+
 
 def simulatePhaseNoise( f, 
                         refPn,
@@ -1147,14 +1340,14 @@ def callGetInterpolatedPhaseNoise():
     """
     fstart =        float(request.vars.fstart)
     fstop =         float(request.vars.fstop)
-    ptsPerDec =     int(request.vars.ptsPerDec)
+    numPts =        int(request.vars.numPts)
     freq_pts =      request.vars.freqs
     pn_pts =        request.vars.pns
 
     freq_pts = map(float, freq_pts.split(','))
     pn_pts = map(float, pn_pts.split(','))
-    f = freqPointsPerDecade( fstart, fstop, ptsPerDec )
-    pns = semilogXInterpolate(f, freq_pts, pn_pts)
+    # f = freqPointsPerDecade( fstart, fstop, ptsPerDec )
+    f, pns = semilogXInterpolate2(freq_pts, pn_pts, num_pts=numPts )
     d = { 'freqs':f,
           'pns':pns,
         }

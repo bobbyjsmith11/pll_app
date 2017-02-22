@@ -56,7 +56,7 @@ var PM_PLOT_PRESENT = false;  // indicates that plotGainPhaseMargin has been cal
 var CL_PLOT_PRESENT = false;  // indicates that plotClosedLoop has been called at least once
 var REF_PLOT_PRESENT = false; // indicates that plotReferencePhaseNoise has been called at least once 
 var VCO_PLOT_PRESENT = false; // indicates that plotVcoPhaseNoise has been called at least once 
-
+var PN_PLOT_PRESENT = false;  // indicates that simulatePhaseNoise has been called at least once
 
 /* Global object for storing all parameters for
  * the phase-locked loop
@@ -147,6 +147,8 @@ function simulatePll( ) {
                 PM_PLOT_PRESENT = true;  
                 plotClosedLoop( data.ref_cl , data.vco_cl, data.freqs );
                 CL_PLOT_PRESENT = true;  
+                simulatePhaseNoise();
+                PN_PLOT_PRESENT = true;
               }
             },
             error: function (result) {
@@ -154,11 +156,55 @@ function simulatePll( ) {
   });
 }
 
+function simulatePhaseNoise() {
+
+  my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
+  dat = "freqs=" + refPhaseNoise.freqs 
+        + "&refPn=" + refPhaseNoise.pns
+        + "&vcoPn=" + vcoPhaseNoise.pns
+        + "&pllFom=" + pll.fom
+        + "&pllFlicker=" + pll.flicker
+        + "&kphi=" + pll.kphi
+        + "&kvco=" + pll.kvco
+        + "&fpfd=" + pll.fpfd
+        + "&N=" + pll.N
+        + "&R=" + pll.R
+        + "&flt_type=" + loop_filter.type
+        + "&c1=" + loop_filter.c1
+        + "&c2=" + loop_filter.c2
+        + "&r2=" + loop_filter.r2
+        + "&c3=" + loop_filter.c3 
+        + "&c4=" + loop_filter.c4 
+        + "&r3=" + loop_filter.r3 
+        + "&r4=" + loop_filter.r4;
+
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              plotPhaseNoise( data.freqs,
+                              data.refPnOut,
+                              data.vcoPnOut,
+                              data.icPnOut,
+                              data.icFlickerOut,
+                              data.compositePn );
+              // console.log(data);
+
+            },
+            error: function (result) {
+            }
+  });
+
+}
+
 function graphReferencePhaseNoise() {
   my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
   dat = "fstart=" + math.min( refPhaseNoise.freqs ) 
         + "&fstop=" + math.max( refPhaseNoise.freqs ) 
-        + "&ptsPerDec=" + 99
+        + "&numPts=" + 1000 
         + "&freqs=" + refPhaseNoise.freqs
         + "&pns=" + refPhaseNoise.pns;
 
@@ -185,7 +231,7 @@ function graphVcoPhaseNoise() {
   my_url = "/pll_app/pll_calcs/callGetInterpolatedPhaseNoise?"
   dat = "fstart=" + math.min( vcoPhaseNoise.freqs ) 
         + "&fstop=" + math.max( vcoPhaseNoise.freqs ) 
-        + "&ptsPerDec=" + 99
+        + "&numPts=" + 1000 
         + "&freqs=" + vcoPhaseNoise.freqs
         + "&pns=" + vcoPhaseNoise.pns;
 
@@ -1239,47 +1285,46 @@ function checkForEnter( e ) {
 
 function testFun() {
 
-  // pll.fpfd = math.unit(document.getElementById("fpfd").value);
-  // pll.fout = math.unit(document.getElementById("fout").value);
-  // pll.N = document.getElementById("divN").value;
-  console.log(math.unit(document.getElementById("fpfd").value).value);
-  console.log(math.unit(document.getElementById("fout").value).value);
-  console.log(Number(document.getElementById("divN").value));
-  console.log(Number(document.getElementById("divR").value));
-  
 
-  // my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
-  // dat = "freqs=" + refPhaseNoise.freqs 
-  //       + "&refPn=" + refPhaseNoise.pns
-  //       + "&vcoPn=" + vcoPhaseNoise.pns
-  //       + "&pllFom=" + pll.fom
-  //       + "&pllFlicker=" + pll.flicker
-  //       + "&kphi=" + pll.kphi
-  //       + "&kvco=" + pll.kvco
-  //       + "&fpfd=" + pll.fpfd
-  //       + "&N=" + pll.N
-  //       + "&R=" + pll.R
-  //       + "&flt_type=" + loop_filter.type
-  //       + "&c1=" + loop_filter.c1
-  //       + "&c2=" + loop_filter.c2
-  //       + "&r2=" + loop_filter.r2
-  //       + "&c3=" + loop_filter.c3 
-  //       + "&c4=" + loop_filter.c4 
-  //       + "&r3=" + loop_filter.r3 
-  //       + "&r4=" + loop_filter.r4;
+  my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
+  dat = "freqs=" + refPhaseNoise.freqs 
+        + "&refPn=" + refPhaseNoise.pns
+        + "&vcoPn=" + vcoPhaseNoise.pns
+        + "&pllFom=" + pll.fom
+        + "&pllFlicker=" + pll.flicker
+        + "&kphi=" + pll.kphi
+        + "&kvco=" + pll.kvco
+        + "&fpfd=" + pll.fpfd
+        + "&N=" + pll.N
+        + "&R=" + pll.R
+        + "&flt_type=" + loop_filter.type
+        + "&c1=" + loop_filter.c1
+        + "&c2=" + loop_filter.c2
+        + "&r2=" + loop_filter.r2
+        + "&c3=" + loop_filter.c3 
+        + "&c4=" + loop_filter.c4 
+        + "&r3=" + loop_filter.r3 
+        + "&r4=" + loop_filter.r4;
 
-  // $.ajax( {
-  //           type: "GET",
-  //           url: my_url,
-  //           datatype: 'json',
-  //           async: true,
-  //           data: dat,
-  //           success: function (data) {
-  //             console.log(data)
-  //           },
-  //           error: function (result) {
-  //           }
-  // });
+  $.ajax( {
+            type: "GET",
+            url: my_url,
+            datatype: 'json',
+            async: true,
+            data: dat,
+            success: function (data) {
+              plotPhaseNoise( data.freqs,
+                              data.refPnOut,
+                              data.vcoPnOut,
+                              data.icPnOut,
+                              data.icFlickerOut,
+                              data.compositePn );
+              // console.log(data);
+
+            },
+            error: function (result) {
+            }
+  });
 
 }
 
