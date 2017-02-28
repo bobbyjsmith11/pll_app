@@ -147,9 +147,9 @@ function simulatePll( ) {
                 PM_PLOT_PRESENT = true;  
                 plotClosedLoop( data.ref_cl , data.vco_cl, data.freqs );
                 CL_PLOT_PRESENT = true;  
-                simulatePhaseNoise();
-                PN_PLOT_PRESENT = true;
               }
+              
+              simulatePhaseNoise();
             },
             error: function (result) {
             }
@@ -185,14 +185,23 @@ function simulatePhaseNoise() {
             async: true,
             data: dat,
             success: function (data) {
-              plotPhaseNoise( data.freqs,
-                              data.refPnOut,
-                              data.vcoPnOut,
-                              data.icPnOut,
-                              data.icFlickerOut,
-                              data.compositePn );
-              // console.log(data);
-
+              if (PN_PLOT_PRESENT) {
+                updatePhaseNoise( data.freqs,
+                                  data.refPnOut,
+                                  data.vcoPnOut,
+                                  data.icPnOut,
+                                  data.icFlickerOut,
+                                  data.compositePn );
+              } else {
+                plotPhaseNoise( data.freqs,
+                                data.refPnOut,
+                                data.vcoPnOut,
+                                data.icPnOut,
+                                data.icFlickerOut,
+                                data.compositePn );
+                PN_PLOT_PRESENT = true;
+                // console.log(data);
+              }
             },
             error: function (result) {
             }

@@ -31,8 +31,51 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
       linedata.push( { "x": freq[i],   "y": gdb[i],   "p": phi[i]} );
     }
     
-    var fstart = linedata[0].x;
-    var fstop = linedata[linedata.length - 1].x;
+    var color = d3.scale.category10();
+    var data = { 
+            "gain":        [],
+            "phase":       []
+            };
+
+    for ( i=0; i<freq.length; i++ ) {
+
+      data.gain.push(    { "x_data": freq[i], "y_data": gdb[i] } );
+      data.phase.push(   { "x_data": freq[i], "y_data": phi[i] } );
+      } 
+
+    var k = d3.keys(data);
+
+    k.forEach( function(d) {
+      data[d].color = color(d);
+    });
+
+    var fstart = data.gain[0].x_data;
+    var fstop = data.gain[data.gain.length - 1].x_data;
+
+    // X scale will fit all values within pixels 0-w
+    var x_scale = d3.scale.log()
+                    .range([0, w])
+                    .domain([fstart, fstop]);
+
+    // X scale will fit all values within pixels h-0 (note, scale is inverted
+    // so bigger is up) 
+
+    var y_left_scale = d3.scale.linear()
+                        .range([h, 0])
+                        .domain(d3.extent(data.gain, function(d) { return d.y_data; }));
+
+    var y_right_scale = d3.scale.linear()
+                        .range([h, 0])
+                        .domain(d3.extent(data.phase, function(d) { return d.y_data; }));
+
+    var leftLine = d3.svg.line()
+                    .x( function(d) { return x(d.f); } )  
+                    .y( function(d) { return y_left_scale(d.y_data); } )
+                    .interpolate("linear");
+    var rightLine = d3.svg.line()
+                    .x( function(d) { return x(d.f); } )  
+                    .y( function(d) { return y_right_scale(d.y_data); } )
+                    .interpolate("linear");
 
     // X scale will fit all values within pixels 0-w
     x_ol = d3.scale.log()
@@ -109,7 +152,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     graph.append("svg:g")
           .attr("class", "y axis")
           .attr("id", "yAxisOlGain")
-          .style("fill","steelblue")
+          // .style("fill","steelblue")
           // .attr("transform", "translate(0,0)")
           .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
           .call(yAxisLeft);
@@ -118,7 +161,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     graph.append("svg:g")
           .attr("class", "y axis")
           .attr("id", "yAxisZeroCross")
-          .style("fill","steelblue")
+          // .style("fill","steelblue")
           // .attr("transform", "translate(0,0)")
           .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
           .call(yAxisZeroCross);
@@ -127,7 +170,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
     graph.append("svg:g")
           .attr("class", "y axis")
           .attr("id", "yAxisOlPm")
-          .style("fill","red")
+          // .style("fill","red")
           // .attr("transform", "translate("+(w)+",0)")
           .attr("transform", "translate("+(w + m[0])+"," + m[1] + ")")
           .call(yAxisRight);
@@ -152,7 +195,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
           .attr("text-anchor", "middle")
           // .attr("transform", "translate("+ (-m[1]/2) +","+ (h/2)+")rotate(-90)")
           .attr("transform", "translate("+ (-m[1]/2 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
-          .attr("fill", "steelblue")
+          // .attr("fill", "steelblue")
           .text("Gain in dB");
 
     // add the left y axis label
@@ -160,7 +203,7 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
           .attr("text-anchor", "middle")
           // .attr("transform", "translate("+ (w+m[1]/2) +","+ (h/2)+")rotate(-90)")
           .attr("transform", "translate("+ (w+m[1]/1.5 + m[0]) +","+ (h/2 + m[1])+")rotate(-90)")
-          .attr("fill", "red")
+          // .attr("fill", "red")
           .text("Phase Margin in degrees");
 
     graph.append("svg:g")
@@ -180,20 +223,24 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
 
     // Add the line by appending an svg:path element with the data line we created above
     // do this AFTER the axes above so that the line is above the tick-lines
+    
+
     graph.append("path")
             .attr("class", "line")
             .attr("id", "ol_gain")
             .attr("d", linefunction(linedata) )
             .attr("fill", "none")
             .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "steelblue");
+            // .style("stroke", "steelblue");
+            .style("stroke", data.gain.color); 
     graph.append("path")
             .attr("class", "line")
             .attr("id", "ol_phase_margin")
             .attr("d", linefunction2(linedata) )
             .attr("fill", "none")
             .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "red");
+            .style("stroke", data.phase.color); 
+            // .style("stroke", "red");
 
 }
 
@@ -948,11 +995,73 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
 
     // define dimensions of graph
 
-    width = 700;
+    width = 800;
     height = 500;
-    m = [80, 80, 80, 80]; // margins
+    m = [80, 80, 80, 180]; // margins
     w = width - m[1] - m[3]; // width
     h  = height - m[0] - m[2]; // height
+
+    var data = { 
+            "reference":   [],
+            "vco":         [],
+            "PLL":         [],
+            "flicker":     [],
+            "composite":   []
+            };
+
+    for ( i=0; i<freq.length; i++ ) {
+
+      data.reference.push(    { "f": freq[i], "pn": refPn[i] } );
+      data.vco.push(          { "f": freq[i], "pn": vcoPn[i] } );
+      data.PLL.push(          { "f": freq[i], "pn": icPn[i] } );
+      data.flicker.push(      { "f": freq[i], "pn": icFlick[i] } );
+      data.composite.push(    { "f": freq[i], "pn": comp[i] } );
+      } 
+    
+    var fstart = data.composite[0].f;
+    var fstop = data.composite[data.composite.length - 1].f;
+
+    // X scale will fit all values within pixels 0-w
+    var x = d3.scale.log()
+              .range([0, w])
+              .domain([fstart, fstop]);
+
+    // X scale will fit all values within pixels h-0 (note, scale is inverted
+    // so bigger is up) 
+
+    var y_scale = d3.scale.linear()
+                    .range([h, 0])
+                    .domain(d3.extent(data.composite, function(d) { return d.pn; }));
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example x(d.x) means the x-scaled value of our data d.x.
+
+    var pnLine = d3.svg.line()
+                    .x( function(d) { return x(d.f); } )  
+                    .y( function(d) { return y_scale(d.pn); } )
+                    .interpolate("linear");
+
+    // create xAxis
+    
+    xAxisMinorPn = d3.svg.axis()
+                     .scale(x)
+                     .orient("bottom")
+                     .tickFormat( "" )
+                     .tickSize(-h);
+
+    xAxisMajorPn = d3.svg.axis()
+                     .scale(x)
+                     .orient("bottom")
+                     .tickValues([10,100,1000,10000,100000,1000000,10000000])
+                     .tickFormat( d3.format("s") )
+                     .tickSize(-h);
+
+    // create y axis
+    yAxisPn = d3.svg.axis()
+                .scale(y_scale)
+                .orient("left")
+                .tickSize(-w)
+                .ticks(6);
 
     // Add an SVG element with the desired dimensions and margin.
     var graph = d3.select("#pnGraph")
@@ -970,126 +1079,19 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
          .attr("width",w)
          .attr("height",h);
 
-    // graph.append("rect")
-    //      .attr("x", m[0])
-    //      .attr("y", m[3])
-    //      .attr("height",h)
-    //      .attr("width",w)
-
-    linedata = [];
-    for ( i=0; i<freq.length; i++ ) {
-      linedata.push( { "freq": freq[i],   
-                       "refPn": refPn[i],   
-                       "vcoPn": vcoPn[i],   
-                       "icPn": icPn[i],   
-                       "icFlick": icFlick[i],   
-                       "comp": comp[i]} );
-    }
-    
-    var fstart = linedata[0].freq;
-    var fstop = linedata[linedata.length - 1].freq;
-
-    // X scale will fit all values within pixels 0-w
-    var x = d3.scale.log()
-              .range([0, w])
-              .domain([fstart, fstop]);
-
-    // X scale will fit all values within pixels h-0 (note, scale is inverted
-    // so bigger is up) 
-    var y = d3.scale.linear()
-                .range([h, 0])
-                .domain(d3.extent(linedata, function(d) { return d.refPn; }));
-    
-    var y2 = d3.scale.linear()
-                .range([h, 0])
-                .domain(d3.extent(linedata, function(d) { return d.vcoPn; }));
-
-    var y3 = d3.scale.linear()
-                .range([h, 0])
-                .domain(d3.extent(linedata, function(d) { return d.icPn; }));
-
-    var y4 = d3.scale.linear()
-                .range([h, 0])
-                .domain(d3.extent(linedata, function(d) { return d.icFlick; }));
-
-    var y5 = d3.scale.linear()
-                .range([h, 0])
-                .domain(d3.extent(linedata, function(d) { return d.comp; }));
-
-    var ytest = d3.scale.linear()
-                .range([h, 0])
-                .domain([-170,-80]);
-    // var ar = [];
-    // ar.push(d3.extent(linedata, function(d) { return d.refPn; }),
-    //         d3.extent(linedata, function(d) { return d.vcoPn; }),
-    //         d3.extent(linedata, function(d) { return d.icPn; }),
-    //         d3.extent(linedata, function(d) { return d.icFlick; }),
-    //         d3.extent(linedata, function(d) { return d.comp; })
-    //         );
-
-    // Create the line function. Note the function is returning the scaled
-    // value. For example x(d.x) means the x-scaled value of our data d.x.
-    var linefunction = d3.svg.line() 
-                          .x( function(d) { return x(d.freq); } )  
-                          .y( function(d) { return y5(d.refPn); } )
-                          .interpolate("linear");
-
-    // Create the line function. Note the function is returning the scaled // value. For example y(d.y) means the x-scaled value of our data d.y.
-    var linefunction2 = d3.svg.line() 
-                          .x( function(d) { return x(d.freq); } )  
-                          .y( function(d) { return y5(d.vcoPn); } )
-                          .interpolate("linear");
-
-    var linefunction3 = d3.svg.line() 
-                          .x( function(d) { return x(d.freq); } )  
-                          .y( function(d) { return y5(d.icPn); } )
-                          .interpolate("linear");
-
-    var linefunction4 = d3.svg.line() 
-                          .x( function(d) { return x(d.freq); } )  
-                          .y( function(d) { return y5(d.icFlick); } )
-                          .interpolate("linear");
-
-    var linefunction5 = d3.svg.line() 
-                          .x( function(d) { return x(d.freq); } )  
-                          .y( function(d) { return y5(d.comp); } )
-                          .interpolate("linear");
-
-    // create xAxis
-    
-    var xAxisMinor = d3.svg.axis()
-                     .scale(x)
-                     .orient("bottom")
-                     .tickFormat( "" )
-                     .tickSize(-h);
-
-    var xAxisMajor = d3.svg.axis()
-                     .scale(x)
-                     .orient("bottom")
-                     .tickValues([10,100,1000,10000,100000,1000000,10000000])
-                     .tickFormat( d3.format("s") )
-                     .tickSize(-h);
-
-    // create left and right yAxes
-    var yAxis = d3.svg.axis()
-                .scale(y5)
-                .orient("left")
-                .tickSize(-w)
-                .ticks(6);
-
     // Add the y-axis to the left
     graph.append("svg:g")
           .attr("class", "y axis")
           .attr("id", "yAxisPn")
           .attr("transform", "translate(" + m[0] + "," + m[1] + ")")
-          .call(yAxis);
+          .call(yAxisPn);
 
     // add the graph title
     graph.append("text")
           .attr("text-anchor", "middle")
           .attr("transform", "translate("+ (w/2 + m[0]) +","+ (-m[0]/2 + m[1])+")")
           .attr("font-size", "18")
-          .text("PLL Phase Noise");
+          .text("Phase Noise Contributors");
 
     // add the x axis label
     graph.append("text")
@@ -1105,71 +1107,139 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMinor")
+          .attr("id", "xAxisMinorPn")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
           .call(xAxisMinor)
             .classed("minor", true);
 
     graph.append("svg:g")
           .attr("class", "x axis")
-          .attr("id", "xAxisMajor")
+          .attr("id", "xAxisMajorPn")
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
           .call(xAxisMajor);
 
     // Add the line by appending an svg:path element with the data line we created above
     // do this AFTER the axes above so that the line is above the tick-lines
-    graph.append("path")
-            .attr("class", "line")
-            .attr("id", "refPn")
-            .attr("d", linefunction(linedata) )
-            .attr("fill", "none")
-            .attr("clip-path", "url(#rect-clip)")
-            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "steelblue");
+    
+    var color = d3.scale.category10();
 
-    graph.append("path")
-            .attr("class", "line")
-            .attr("id", "vcoPn")
-            .attr("d", linefunction2(linedata) )
-            .attr("fill", "none")
-            .attr("clip-path", "url(#rect-clip)")
-            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "red");
+    var legend = graph.append('g')
+                  .attr("class", "legend")
+                  .attr("x", w - 65)
+                  .attr("y", 25)
+                  .attr("height", 100)
+                  .attr("width", 100); 
+ 
 
-    graph.append("path")
-            .attr("class", "line")
-            .attr("id", "icPn")
-            .attr("d", linefunction3(linedata) )
-            .attr("fill", "none")
-            .attr("clip-path", "url(#rect-clip)")
-            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "orange");
+    var y_legend = 60;
+    var x_legend = m[1] + 5;
+    var spacing = 110;
+    var n = 0;
 
-    graph.append("path")
-            .attr("class", "line")
-            .attr("id", "icFlick")
-            .attr("d", linefunction4(linedata) )
-            .attr("fill", "none")
-            .attr("clip-path", "url(#rect-clip)")
-            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "cyan");
+    var k = d3.keys(data);
 
-    graph.append("path")
-            .attr("class", "line")
-            .attr("id", "comp")
-            .attr("d", linefunction5(linedata) )
-            .attr("fill", "none")
-            .attr("clip-path", "url(#rect-clip)")
-            .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-            .style("stroke", "black")
-            .style("stroke-width", 2);
-  
-    // graph.append("g")
-    //   .attr("class", "legend")
-    //   .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
-    //   .style("font-size","12px")
-    //   .call(d3.legend);
+    k.forEach( function(d) {
+      
+      graph.append("path")
+              .attr("class", "line")
+              .attr("id", d)
+              .attr("d", pnLine(data[d]) )
+              .attr("fill", "none")
+              .attr("clip-path", "url(#rect-clip)")
+              .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
+              .style("stroke", function() {
+                return data[d].color = color(d); });
+      
+      legend.append("rect")
+            .attr("x", x_legend + n*spacing)
+            .attr("y", y_legend )
+            .attr("height", 10)
+            .attr("width", 10)
+            .style("fill", data[d].color );
+
+      legend.append("text")
+            .attr("x", x_legend + n*spacing + 15 )
+            .attr("y", y_legend + 9)
+            .text(d);
+      n+=1;
+    });
 
 }
 
+/* updates the phase noise with new data
+ * with the new data
+ * @param {Array} pn - open loop gain array in db
+ * @param {Array} freq - frequency array in Hz
+ * @param {Number} dur - duration of graph transition
+*/
+function updatePhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp, dur=500) {
+    // get the line data
+    
+    var data = { 
+            "reference":   [],
+            "vco":         [],
+            "PLL":         [],
+            "flicker":     [],
+            "composite":   []
+            };
 
+    for ( i=0; i<freq.length; i++ ) {
+
+      data.reference.push(    { "f": freq[i], "pn": refPn[i] } );
+      data.vco.push(          { "f": freq[i], "pn": vcoPn[i] } );
+      data.PLL.push(          { "f": freq[i], "pn": icPn[i] } );
+      data.flicker.push(      { "f": freq[i], "pn": icFlick[i] } );
+      data.composite.push(    { "f": freq[i], "pn": comp[i] } );
+      } 
+
+    var fstart = data.composite[0].f;
+    var fstop = data.composite[data.composite.length - 1].f;
+
+    // X scale will fit all values within pixels 0-w
+    var x = d3.scale.log()
+              .range([0, w])
+              .domain([fstart, fstop]);
+
+    // X scale will fit all values within pixels h-0 (note, scale is inverted
+    // so bigger is up) 
+
+    var y_scale = d3.scale.linear()
+                    .range([h, 0])
+                    .domain(d3.extent(data.composite, function(d) { return d.pn; }));
+
+    // Create the line function. Note the function is returning the scaled
+    // value. For example x(d.x) means the x-scaled value of our data d.x.
+
+    var pnLine = d3.svg.line()
+                    .x( function(d) { return x(d.f); } )  
+                    .y( function(d) { return y_scale(d.pn); } )
+                    .interpolate("linear");
+    
+    var graph = d3.select("#pnGraph").transition();
+
+    graph.select("#xAxisMinorPn")
+            .transition()
+            .duration(dur)
+            .call(xAxisMinorPn);
+
+    graph.select("#xAxisMajorPn")
+            .transition()
+            .duration(dur)
+            .call(xAxisMajorPn);
+    
+    graph.select("#yAxisPn")
+            .transition()
+            .duration(dur)
+            .call(yAxisPn);
+
+    var k = d3.keys(data);
+
+    k.forEach( function(d) {
+      
+      graph.select("#" + d)
+              .duration(dur)
+              .attr("d", pnLine(data[d]) );
+      
+    });
+
+}
