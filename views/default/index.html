@@ -153,21 +153,21 @@
 
   <div class="panel with-nav-tabs panel-default plot-panel">
     <ul class="nav nav-tabs">
-      <li class="active"><a data-toggle="tab" href="#openLoopResponse">OPEN LOOP RESPONSE</a></li>
-      <li ><a data-toggle="tab" href="#closedLoopResponse">CLOSED LOOP RESPONSE</a></li>
+      <li ><a data-toggle="tab" href="#openLoopResponse">OPEN LOOP RESPONSE</a></li>
+      <li class="hidden"><a data-toggle="tab" href="#closedLoopResponse">CLOSED LOOP RESPONSE</a></li>
       <li ><a data-toggle="tab" href="#referencePn">REFERENCE PHASE NOISE</a></li>
       <li ><a data-toggle="tab" href="#vcoPn">VCO PHASE NOISE</a></li>
-      <li ><a data-toggle="tab" href="#totalPnPane">COMPOSITE PHASE NOISE</a></li>
+      <li class="active"><a data-toggle="tab" href="#totalPnPane">COMPOSITE PHASE NOISE</a></li>
     </ul>
 
     <div class="tab-content">
 
-      <div id="openLoopResponse" class="tab-pane fade in active">
+      <div id="openLoopResponse" class="tab-pane fade in">
         <div id="pmGraph" class="svg-container">
         </div>
       </div>
 
-      <div id="closedLoopResponse" class="tab-pane fade in">
+      <div id="closedLoopResponse" class="tab-pane fade in hidden">
         <div id="clGraph" class="svg-container">
         </div>
       </div>
@@ -246,7 +246,7 @@
 
       </div>
 
-      <div id="totalPnPane" class="tab-pane fade in">
+      <div id="totalPnPane" class="tab-pane fade in active">
         <div id="pnGraph" class="svg-container" >
         </div>
 

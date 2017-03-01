@@ -803,8 +803,8 @@ def simulatePll( fstart,
     # # Open-loop gain 
     g_ol = g/N
     g_ol_db = 10*np.log10(np.absolute(g_ol))
-    ph_ol = 180 + np.unwrap(np.angle(g_ol))*180/np.pi
-    # ph_ol = np.unwrap(np.angle(g_ol))*180/np.pi
+    # ph_ol = 180 + np.unwrap(np.angle(g_ol))*180/np.pi
+    ph_ol = np.unwrap(np.angle(g_ol))*180/np.pi
 
     # # Closed-loop reference transfer gain
     cl_r = (1.0/R)*(g/(1+g/N))
@@ -959,11 +959,15 @@ def test_smoothed_curve( ):
     return freq, refPn, vcoPn 
 
 def semilogXInterpolate2( f, y, num_pts=1000 ):
+    """ take an array of x (f) and y values. Return an array
+    of x and y values with num_pts points. Linear interpolate
+    between the input x and y values with x in the log scale.
+    """
     x = np.log10(np.array(f))
     xx = np.linspace(min(x), max(x), num_pts)
 
     itp = interp1d(x,y, kind='linear')
-    window_size, poly_order = 151, 3
+    window_size, poly_order = 251, 3
     yy_sg = savgol_filter(itp(xx), window_size, poly_order)
     x_log = 10**(xx)
 

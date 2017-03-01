@@ -1203,6 +1203,7 @@ function refTableChangedHandler() {
     }
   }
   graphReferencePhaseNoise(); 
+  // simulatePhaseNoise();
 }
 
 function vcoTableChangedHandler() {
@@ -1229,6 +1230,7 @@ function vcoTableChangedHandler() {
     }
   }
   graphVcoPhaseNoise(); 
+  // simulatePhaseNoise();
 }
 
 function check_valid_table_number( val, table, row, col=1 ) {
