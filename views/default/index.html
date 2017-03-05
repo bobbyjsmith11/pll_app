@@ -41,14 +41,16 @@
                                                                       value=1
                             data-toggle="tooltip" title="R divider" onchange="onRChanged()">
 
-    <input type="number" class="form-control input-sm pll-form-input" id="divN" step="1" value=200
+    <input type="number" class="form-control input-sm pll-form-input" id="divN"
+                                                                      step="1"
+                                                                      value=200
                             data-toggle="tooltip" title="N divider" onchange="onNChanged()">
     
     <input type="string" class="form-control input-sm pll-form-input" id="kphi"
                                                                       value="5 mA"
                             data-toggle="tooltip" title="charge pump current" onchange="onKphiChanged()">
 
-    <input type="string" class="form-control input-sm pll-form-input" id="kvco" value="10 MHz"
+    <input type="string" class="form-control input-sm pll-form-input" id="kvco" value="20 MHz"
                             data-toggle="tooltip" title="tuning sensitivity (Hz/V)" onchange="onKvcoChanged()">
 
     <label for="pllFom" id="fomLabel">PLL IC Figure-of-Merit:</label>
@@ -69,8 +71,8 @@
               style="position:absolute;top:49%;left:75%;width:180px;" 
               onchange="setFilterType()">
       <option value="0">2nd Order Passive</option>
-      <option value="1" selected="selected">3rd Order Passive</option>
-      <option value="2">4th Order Passive</option>
+      <option value="1" >3rd Order Passive</option>
+      <option value="2" selected="selected">4th Order Passive</option>
       <!--option value="3">2nd Order Active</option-->
       <!--option value="4">3rd Order Active</option-->
       <!--option value="5">4th Order Active</option-->
@@ -105,13 +107,14 @@
 
     <label for="pm" id="pmLabel"
              style="position:absolute;top:87%;left:72%;text-align:right;width:100px">phase margin:</label>
-    <input type="string" class="form-control input-sm pll-form-input" id="pm" value="45.0 deg"
+    <input type="string" class="form-control input-sm pll-form-input" id="pm" value="47.8 deg"
                             style="position:absolute;top:85%;left:87%;"
                                                                           onchange="onPmChanged()">
 
     <label for="fc" id="fcLabel"
                style="position:absolute;top:94%;left:77%;width:100px;text-align:right;">loop bw:</label>
-    <input type="string" class="form-control input-sm pll-form-input" id="fc" value="100 kHz"
+    <input type="string" class="form-control input-sm pll-form-input" id="fc"
+                                                                      value="100 kHz"
                             style="position:absolute;top:92%;left:87%;"
                                                                           onchange="onFcChanged()">
 

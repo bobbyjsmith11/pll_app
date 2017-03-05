@@ -8,11 +8,13 @@
 from gluon.tools import Service
 service = Service(globals())
 
+import time
 import numpy as np
 import matplotlib.pylab as plt
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
+from scipy.optimize import fsolve
 
 def call():
     """
@@ -237,27 +239,6 @@ class PllSecondOrderPassive( object ):
         """
         return c1*c2*r2
 
-def test3rdOrderPassive(gamma=1.024):
-    fc = 100e3
-    pm = 45.0
-    gamma = gamma
-    kphi = 4.69e-3
-    kvco = 10e6
-    fout = 2000e6
-    fpfd = 10e6 
-    N = fout/fpfd
-    
-    pll = PllSecondOrderPassive( fc,
-                                 pm,
-                                 kphi,
-                                 kvco,
-                                 N,
-                                 gamma=gamma,
-                                 t31=0.6)
-    
-    return pll.calc_components()
-
-
 class PllThirdOrderPassive( PllSecondOrderPassive ):
     def __init__(self,
                  fc,
@@ -266,7 +247,7 @@ class PllThirdOrderPassive( PllSecondOrderPassive ):
                  kvco,
                  N,
                  gamma=1.136,
-                 t31=0.4):
+                 t31=0.6):
         """
         :Parameters:
         fc (float) - cutoff frequency in Hz
@@ -420,28 +401,55 @@ class PllThirdOrderPassive( PllSecondOrderPassive ):
                 np.arctan( omega_c*x*t31 ) - phi
         return val
 
-def test4thComponents():
+
+def test4thOrderPassive( t31=0.4, t43=0.4 ):
     fc = 10e3
     pm = 47.8
-    gamma = 1.115
     kphi = 4e-3
     kvco = 20e6
     fout = 900e6
     fpfd = 200e3
-    N = fout/fpfd
-    t31 = 0.4
-    t43 = 0.4
+    N = float(fout)/fpfd
+    fstart = 10
+    fstop = 100e6
+    ptsPerDec = 100
+    fref = 10e6
+    R = int(fref/fpfd)
+    # R = 1
     
-    pll = PllFourthOrderPassive(fc,
-                                pm,
-                                kphi,
-                                kvco,
-                                N,
-                                gamma=gamma,
-                                t31=t31,
-                                t43=t43)
+    pll = PllFourthOrderPassive( fc,
+                                 pm,
+                                 kphi,
+                                 kvco,
+                                 N,
+                                 gamma=1.115,
+                                 t31=t31,
+                                 t43=t43)
     
-    return pll.calc_components()
+
+    d = pll.calc_components()
+    # return d
+
+    flt = {
+            'c1':d['c1'],
+            'c2':d['c2'],
+            'c3':d['c3'],
+            'c4':d['c4'],
+            'r2':d['r2'],
+            'r3':d['r3'],
+            'r4':d['r4'],
+            'flt_type':"passive" 
+           }
+
+    f,g,p,fz,pz,ref_cl,vco_cl = simulatePll( fstart, 
+                                             fstop, 
+                                             ptsPerDec,
+                                             kphi,
+                                             kvco,
+                                             N,
+                                             R,
+                                             filt=flt)
+    return d, fz, pz
 
 class PllFourthOrderPassive( PllSecondOrderPassive ):
     def __init__(self,
@@ -451,8 +459,8 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
                  kvco,
                  N,
                  gamma=1.115,
-                 t31=0.4,
-                 t43=0.4):
+                 t31=0.107,
+                 t43=0.107):
         """
         :Parameters:
         fc (float) - cutoff frequency in Hz
@@ -482,7 +490,11 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
         # solve for time constants
         d['t1'] = self.calc_t1(self.fc, 
                                self.pm, 
-                               self.gamma)
+                               self.gamma,
+                               t31=self.t31,
+                               t43=self.t43)
+        # d['t1'] = 4.0685e-6
+        # print( 't1 = ' + str(d['t1']) )
 
         d['t3'] = d['t1']*self.t31 
         d['t4'] = d['t1']*self.t31*self.t43
@@ -590,11 +602,11 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
         """
         a = 1e-15   # initial guess for a
         b = 1.0       # initial guess for b
-        fa = self.func_t1(a,fc,pm,t31=t31,gamma=gamma)
-        fb = self.func_t1(b,fc,pm,t31=t31,gamma=gamma)
+        fa = self.func_t1(a,fc,pm,t31=t31,t43=t43,gamma=gamma)
+        fb = self.func_t1(b,fc,pm,t31=t31,t43=t43,gamma=gamma)
         for i in range(num_iters):
             guess = (a+b)/2
-            if (self.func_t1(guess,fc,pm,t31=t31,gamma=gamma) < 0):
+            if (self.func_t1(guess,fc,pm,t31=t31,t43=t43,gamma=gamma) < 0):
                 b = guess
             else:
                 a = guess
@@ -626,6 +638,230 @@ class PllFourthOrderPassive( PllSecondOrderPassive ):
                 np.arctan( omega_c*x*t31 ) -\
                 np.arctan( omega_c*x*t31*t43 ) - phi
         return val
+
+class PllFourthOrderPassive2( PllSecondOrderPassive ):
+    def __init__(self,
+                 fc,
+                 pm,
+                 kphi,
+                 kvco,
+                 N,
+                 gamma=1.115):
+        """
+        :Parameters:
+        fc (float) - cutoff frequency in Hz
+        pm (float) - phase margin in degrees
+        kphi (float) - charge pump gain in Amps per radian
+        kvco (float) - vco tuning sensitivity in Hz/V
+        N (int) - loop multiplication ratio
+        gamma (float) - optimization factor (default=1.115)
+        t31 (float) - ratio of T3 to T1 (default=0.4)
+        t43 (float) - ratio of T4 to T3 (default=0.4)
+            note: for a realizable solution, t31 + t43 <= 1
+        """
+        self.fc = fc
+        self.pm = pm
+        self.kphi = kphi
+        self.kvco = kvco
+        self.N = N
+        self.gamma = gamma
+        self.pole3 = fc*30
+        self.pole4 = fc*10
+
+    def calc_t1(self, 
+                fc, 
+                pm, 
+                gamma,
+                num_iters=100,
+                plotme=False):
+        """ numerically solve for t1 using the bisection method
+            see: https://en.wikibooks.org/wiki/Numerical_Methods/Equation_Solving
+        :Parameters:
+        fc (float) - cutoff frequency in Hz
+        pm (float) - phase margin in degrees
+        gamma (float) - optimization factor (1.136)
+        num_iters (int) - number of times to loop
+        """
+        a = 1e-15   # initial guess for a
+        b = 1.0       # initial guess for b
+        fa = self.func_t1(a,fc,pm,gamma=gamma)
+        fb = self.func_t1(b,fc,pm,gamma=gamma)
+        for i in range(num_iters):
+            guess = (a+b)/2
+            if (self.func_t1(guess,fc,pm,gamma=gamma) < 0):
+                b = guess
+            else:
+                a = guess
+            if plotme:
+                x = np.linspace(a,b,1000)
+                y = []
+                for xx in x:
+                    y.append(self.func_t1(xx,fc,pm,gamma=gamma) )
+                fig, ax = plt.subplots()
+                ax.plot(x,y,'r',label='func_t1')
+                plt.grid(True)
+                plt.show()
+        return guess
+
+    def func_t1(self,
+                t1, 
+                fc, 
+                pm,
+                gamma=1.115):
+        """ simulate t1. This function is used to 
+        numerically solve for T1. 
+        """
+        omega_c = 2*np.pi*fc
+        phi = pm*np.pi/180
+        t3 = 1.0/self.pole3
+        t4 = 1.0/self.pole4
+        # val = np.arctan2( 1.0, ( (omega_c)*(t1*t3*t4) )/gamma ) - \
+        #       np.arctan2( 1.0, 1.0/omega_c*t1 ) - \
+        #       np.arctan2( 1.0, 1.0/omega_c*t3 ) - \
+        #       np.croarctan2( 1.0, 1.0/omega_c*t1*t4 ) - phi
+        val = np.arctan( gamma/( (omega_c)*(t1*t3*t4) ) ) - \
+              np.arctan( omega_c*t1 ) - \
+              np.arctan( omega_c*t3 ) - \
+              np.arctan( omega_c*t1*t4 ) - phi 
+        return val
+
+    def calc_components(self):
+        """ return a dict with the component values """
+        d = {}
+        omega_c = 2*np.pi*self.fc
+
+        d['pole3'] = self.pole3
+        d['pole4'] = self.pole4
+        # solve for time constants
+        d['t1'] = self.calc_t1( self.fc,
+                                self.pm,
+                                gamma=self.gamma )
+        d['pole1'] = 1.0/d['t1']
+
+        d['t3'] = 1.0/self.pole3
+        d['t4'] = 1.0/self.pole4
+  
+        d['t2'] = self.gamma/( (omega_c**2)*(d['t1'] + d['t3'] + d['t4'] ) )
+        d['zero'] = 1.0/d['t2']
+        # solve for coefficients
+        # d['a0'] = self.calc_a0(self.kphi, 
+        #                        self.kvco, 
+        #                        self.N, 
+        #                        self.fc, 
+        #                        d['t1'],
+        #                        d['t2'],
+        #                        d['t3'],
+        #                        d['t4'])
+    
+        # d['a1'] = d['a0']*(d['t1'] + d['t3'] + d['t4'])
+        # d['a2'] = d['a0']*(d['t1']*d['t3'] + d['t1']*d['t4'] + d['t3']*d['t4'])
+        # d['a3'] = d['a0']*d['t1']*d['t3']*d['t4']
+
+        # c1_t3, r3_t3 = self.calc_c1_r3(d['a0'],d['t1'],d['t2'],d['t3'])
+        # c1_t4, r3_t4 = self.calc_c1_r3(d['a0'],d['t1'],d['t2'],d['t4'])
+
+        # d['c1'] = (c1_t3 + c1_t4)/2
+        # d['r3'] = (r3_t3 + r3_t4)/2
+
+        # d['c2'], d['c3'] = self.calc_c2_c3( d['a0'],
+        #                            d['a1'],
+        #                            d['a2'],
+        #                            d['a3'],
+        #                            d['t2'],
+        #                            d['r3'],
+        #                            d['c1'] )
+      
+        # d['c4'] = d['a0']- d['c1']- d['c2'] - d['c3']
+
+        # d['r2'] = d['t2']/d['c2']
+
+        # d['r4'] = d['a3']/(d['t2']*d['r3']*d['c1']*d['c3']*d['c4'])
+
+
+        return d
+
+def test_manual_solution( p1, p3, p4, fc=10e3, pm=47.8, gamma=1.115 ):
+
+    d = {}
+    d['t1'] = 1.0/p1
+    d['t3'] = 1.0/p3
+    d['t31'] = d['t3']/d['t1'] 
+    d['t4'] = 1.0/p4
+    d['t43'] = d['t4']/d['t3'] 
+    d['fc'] = fc
+    d['pm'] = pm
+    d['gamm'] = gamma
+    omega_c = 2*np.pi*fc
+    phi = np.pi*float(fc)/180 
+
+    d['t2'] = gamma/( (omega_c**2)*(d['t1'] + d['t3'] + d['t4'] ) )
+    d['zero'] = 1.0/d['t2']
+
+    return d
+
+def test_calc_t1( ):
+    fc = 10e3
+    pm = 47.8
+    gamma = 1.115
+    kphi = 4e-3
+    kvco = 20e6
+    fout = 900e6
+    fpfd = 200e3
+    N = float(fout)/fpfd
+    fstart = 10
+    fstop = 100e6
+    ptsPerDec = 100
+    fref = 10e6
+    R = int(fref/fpfd)
+    # R = 1
+   
+    pll = PllFourthOrderPassive2( fc,
+                                 pm,
+                                 kphi,
+                                 kvco,
+                                 N,
+                                 gamma=gamma)
+    d = pll.calc_components() 
+
+    # print("pll.gamma = " + str(pll.gamma))
+    # phi = pm*np.pi/180
+    # func = lambda x: np.arctan( gamma/(omega_c*x*(1+t31)) ) - \
+    #                             np.arctan( omega_c*x ) - \
+    #                             np.arctan( omega_c*x*t31 ) -\
+    #                             np.arctan( omega_c*x*t31*t43 ) - phi
+    # x_initial_guess = 1e-6
+    # x_solution = fsolve( func, x_initial_guess )
+
+
+    # t1 = pll.calc_t1( fc,
+    #                   pm,
+    #                   gamma=gamma )
+    # pll.pole1 = 1.0/t1
+    # pll.pole2 = None
+
+    # x = np.linspace(1e-15,30e-6,10000)
+    # y = []
+    # for xx in x:
+    #     y.append(pll.func_t1(xx,fc,pm,gamma=gamma) )
+    # fig, ax = plt.subplots()
+    # ax.plot(x,y,'r',label='func_t1')
+    # plt.grid(True)
+    # plt.show()
+    return d
+
+def plot_arctan( ):
+    x = np.linspace(-np.pi/2,np.pi/2,1000)
+
+    y1 = np.arctan(x)
+    y2 = np.arctan2(1, 1/x)
+
+    fig, ax = plt.subplots()
+    ax.plot(x,y1,'r',label='arctan')
+    ax.plot(x,y2,'g',label='arctan2')
+    legend = ax.legend()
+    plt.grid(True)
+    plt.show()
+
 
 @service.json
 def callSimulatePll():
@@ -676,22 +912,67 @@ def callSimulatePll():
         }
     return response.json(d)
 
+def test3rdOrderPassive( ):
+    fc = 100e3
+    pm = 45.0
+    kphi = 5e-3
+    kvco = 10e6
+    N = 200
+    fstart = 10
+    fstop = 100e6
+    ptsPerDec = 100
+    R = 1
+    
+    pll = PllThirdOrderPassive( fc,
+                                 pm,
+                                 kphi,
+                                 kvco,
+                                 N,
+                                 gamma=1.024,
+                                 t31=0.6)
+
+    d = pll.calc_components()
+
+    flt = {
+            'c1':d['c1'],
+            'c2':d['c2'],
+            'c3':d['c3'],
+            'c4':d['c4'],
+            'r2':d['r2'],
+            'r3':d['r3'],
+            'r4':d['r4'],
+            'flt_type':"passive" 
+           }
+
+    f,g,p,fz,pz,ref_cl,vco_cl = simulatePll( fstart, 
+                                             fstop, 
+                                             ptsPerDec,
+                                             kphi,
+                                             kvco,
+                                             N,
+                                             R,
+                                             filt=flt)
+    return flt, fz, pz
+    # return pll
+
+
 def testSimulateOpenLoop():
     fstart = 10
     fstop = 100e6
     ptsPerDec = 100
-    kphi = 1e-3
-    kvco = 60e6
-    N = 39200
-    R = 200
+    kphi = 5e-3
+    kvco = 10e6
+    N = 200
+    R = 1 
+    
     flt = {
-            'c1':52.4e-12,
-            'c2':1.03e-9,
-            'c3':10.9e-12,
-            'c4':6.34e-12,
-            'r2':47.8e3,
-            'r3':111e3,
-            'r4':279e3,
+            'c1':104e-12,
+            'c2':1.7e-9,
+            'c3':23.6e-12,
+            'c4':0,
+            'r2':2.64e3,
+            'r3':10.9e3,
+            'r4':0,
             'flt_type':"passive" 
            }
     f,g,p,fz,pz,ref_cl,vco_cl = simulatePll( fstart, 
@@ -703,7 +984,14 @@ def testSimulateOpenLoop():
                                              R,
                                              filt=flt)
 
-    return f, g, p, fz, pz, ref_cl, vco_cl
+    # fig, ax = plt.subplots()
+    # ax.semilogx(f,g,'b',label='gain')
+    # ax.semilogx(f,p,'r',label='phase')
+    # legend = ax.legend()
+    # plt.grid(True)
+    # plt.show()
+    # return f, g, p, fz, pz, ref_cl, vco_cl
+    return fz, pz
 
 def getInterpolatedFzeroPzero( f, g, p ):
     """ look at the points of f, g and p surrounding where
@@ -726,7 +1014,7 @@ def getInterpolatedFzeroPzero( f, g, p ):
     
     fz = newf[0] - (newg[0]/mg)
     deltaf = fz - newf[0]   # distance from newf[0] to 0db crossover
-    pz = mp*deltaf + newp[0]
+    pz = 180 + mp*deltaf + newp[0]
     return fz, pz
 
 def getIndexZeroDbCrossover( g ):

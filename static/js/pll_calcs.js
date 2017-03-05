@@ -139,8 +139,8 @@ function simulatePll( ) {
               // console.log(data)
               if (PM_PLOT_PRESENT) {
                 updateGainPhaseMarginGraph( data.gains , data.phases, data.freqs );
-                // setPm(data.pzero);
-                // setFc(data.fzero); 
+                setPm(data.pzero);
+                setFc(data.fzero); 
                 updateClosedLoopGraph( data.ref_cl , data.vco_cl, data.freqs );
               } else {
                 plotGainPhaseMargin( data.gains , data.phases, data.freqs );
