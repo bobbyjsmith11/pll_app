@@ -9,7 +9,7 @@ from gluon.tools import Service
 service = Service(globals())
 
 import numpy as np
-# import matplotlib.pylab as plt
+import matplotlib.pylab as plt
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
@@ -1129,7 +1129,7 @@ def callSimulatePhaseNoise():
     refPn =         map(float, refPn.split(','))
 
     pllFom =        float(request.vars.pllFom)
-    pllFlicker =    float(request.vars.pllFlicker)
+    # pllFlicker =    float(request.vars.pllFlicker)
     kphi =          float(request.vars.kphi)
     kvco =          float(request.vars.kvco)
     fpfd =          float(request.vars.fpfd)
@@ -1154,11 +1154,10 @@ def callSimulatePhaseNoise():
             'flt_type':flt_type
             }
 
-    f, ref, vco, ic, flick, comp = simulatePhaseNoise2( f,
+    f, ref, vco, ic, comp = simulatePhaseNoise2( f,
                                                        refPn,
                                                        vcoPn,
                                                        pllFom,
-                                                       pllFlicker,
                                                        kphi,
                                                        kvco,
                                                        fpfd,
@@ -1170,7 +1169,6 @@ def callSimulatePhaseNoise():
           'refPnOut':ref,
           'vcoPnOut':vco,
           'icPnOut': ic,
-          'icFlickerOut': flick,
           'compositePn': comp
         }
     return response.json(d)
@@ -1323,7 +1321,6 @@ def simulatePhaseNoise2( f,
                         refPn,
                         vcoPn,
                         pllFom,
-                        pllFlicker,
                         kphi,
                         kvco,
                         fpfd,
@@ -1403,10 +1400,6 @@ def simulatePhaseNoise2( f,
     icPn = []
     icPn.extend( icPnOut )
 
-    icFlickerOut = pllFlicker + 20*np.log10(fpfd) - 10*np.log10(freq) + cl_ic_db
-    icFlick = []
-    icFlick.extend( icFlickerOut )
-
     # # Closed-loop VCO transfer gain
     cl_vco = 1.0/(1+g/N)
     cl_vco_db = 20*np.log10(np.absolute(cl_vco))
@@ -1416,12 +1409,12 @@ def simulatePhaseNoise2( f,
 
     compPn = []
     for i in range(len(freq)):
+
         compPn.append(powerSum( [ refPnOut[i],
                                   vcoPnOut[i],
-                                  icPnOut[i],
-                                  icFlickerOut[i] ] ))
+                                  icPnOut[i] ] ))
 
-    return freq, refPn, vcoPn, icPn, icFlick, compPn
+    return freq, refPn, vcoPn, icPn, compPn
 
 
 def simulatePhaseNoise( f, 

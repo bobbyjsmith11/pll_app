@@ -29,7 +29,6 @@ window.onload = function() {
   getKvco();
   getPm();
   getFom();
-  getFlicker();
 
   // synthPll();
   setFilterType();
@@ -71,7 +70,7 @@ var pll =   { fref:     10e6,
               kvco:     60e6,
               pm:       49.2,
               fom:      -227,
-              flicker:  -268
+              flicker:  -300
             };
 
 // supports up to 4th order passive or active
@@ -163,7 +162,6 @@ function simulatePhaseNoise() {
         + "&refPn=" + refPhaseNoise.pns
         + "&vcoPn=" + vcoPhaseNoise.pns
         + "&pllFom=" + pll.fom
-        + "&pllFlicker=" + pll.flicker
         + "&kphi=" + pll.kphi
         + "&kvco=" + pll.kvco
         + "&fpfd=" + pll.fpfd
@@ -190,14 +188,12 @@ function simulatePhaseNoise() {
                                   data.refPnOut,
                                   data.vcoPnOut,
                                   data.icPnOut,
-                                  data.icFlickerOut,
                                   data.compositePn );
               } else {
                 plotPhaseNoise( data.freqs,
                                 data.refPnOut,
                                 data.vcoPnOut,
                                 data.icPnOut,
-                                data.icFlickerOut,
                                 data.compositePn );
                 PN_PLOT_PRESENT = true;
                 // console.log(data);
@@ -1138,16 +1134,16 @@ function getFom () {
 }
 
 
-/* User changes Pll flicker noise changed
- * */
-function onFlickerChanged() {
-  pll.flicker = parseFloat( document.getElementById("pllFlicker").value );
-
-  synthPll();
-}
-function getFlicker () {
-  pll.flicker = Number(document.getElementById("pllFlicker").value);
-}
+// /* User changes Pll flicker noise changed
+//  * */
+// function onFlickerChanged() {
+//   pll.flicker = parseFloat( document.getElementById("pllFlicker").value );
+// 
+//   synthPll();
+// }
+// function getFlicker () {
+//   pll.flicker = Number(document.getElementById("pllFlicker").value);
+// }
 
 /* checks the value of the user input for proper formatting against
  * the unit. returns true if good.
@@ -1302,7 +1298,6 @@ function testFun() {
         + "&refPn=" + refPhaseNoise.pns
         + "&vcoPn=" + vcoPhaseNoise.pns
         + "&pllFom=" + pll.fom
-        + "&pllFlicker=" + pll.flicker
         + "&kphi=" + pll.kphi
         + "&kvco=" + pll.kvco
         + "&fpfd=" + pll.fpfd
@@ -1328,7 +1323,11 @@ function testFun() {
                               data.refPnOut,
                               data.vcoPnOut,
                               data.icPnOut,
-                              data.icFlickerOut,
+                              data.compositePn );
+              plotPhaseNoise( data.freqs,
+                              data.refPnOut,
+                              data.vcoPnOut,
+                              data.icPnOut,
                               data.compositePn );
               // console.log(data);
 

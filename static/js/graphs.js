@@ -979,7 +979,7 @@ function updateVcoPhaseNoise(pns, freq, dur=500) {
 //
 /* Sets up the initial open-loop gain and phase margin graph
  * */
-function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
+function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
 
     // define dimensions of graph
 
@@ -993,7 +993,6 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
             "reference":   [],
             "vco":         [],
             "PLL":         [],
-            "flicker":     [],
             "composite":   []
             };
 
@@ -1002,7 +1001,6 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
       data.reference.push(    { "f": freq[i], "pn": refPn[i] } );
       data.vco.push(          { "f": freq[i], "pn": vcoPn[i] } );
       data.PLL.push(          { "f": freq[i], "pn": icPn[i] } );
-      data.flicker.push(      { "f": freq[i], "pn": icFlick[i] } );
       data.composite.push(    { "f": freq[i], "pn": comp[i] } );
       } 
     
@@ -1160,14 +1158,13 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp) {
  * @param {Array} freq - frequency array in Hz
  * @param {Number} dur - duration of graph transition
 */
-function updatePhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp, dur=500) {
+function updatePhaseNoise ( freq, refPn, vcoPn, icPn, comp, dur=500) {
     // get the line data
     
     var data = { 
             "reference":   [],
             "vco":         [],
             "PLL":         [],
-            "flicker":     [],
             "composite":   []
             };
 
@@ -1176,7 +1173,6 @@ function updatePhaseNoise ( freq, refPn, vcoPn, icPn, icFlick, comp, dur=500) {
       data.reference.push(    { "f": freq[i], "pn": refPn[i] } );
       data.vco.push(          { "f": freq[i], "pn": vcoPn[i] } );
       data.PLL.push(          { "f": freq[i], "pn": icPn[i] } );
-      data.flicker.push(      { "f": freq[i], "pn": icFlick[i] } );
       data.composite.push(    { "f": freq[i], "pn": comp[i] } );
       } 
 
