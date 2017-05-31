@@ -1,0 +1,26 @@
+/*
+ * Start Bootstrap - Logo Nav (http://startbootstrap.com/)
+ * Copyright 2013-2016 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
+ */
+
+
+html * {
+  font-family: "HP simplified";
+}
+
+.navbar {
+  background: #3399FF; */
+
+}
+
+
+.navbar .nav > li > a {
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+body {
+  /* background-color: #D9D9D9; */
+  background: linear-gradient(to bottom, #4AFFC3 0%, #FFFFC3 100%);
+}

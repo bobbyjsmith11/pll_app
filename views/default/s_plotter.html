@@ -1,0 +1,50 @@
+{{response.files.append(URL('static','css/s_plotter.css'))}}
+{{response.files.append(URL('static','js/s_plot.js'))}}
+{{extend 'layout.html'}}
+{{left_sidebar_enabled=False}}
+{{right_sidebar_enabled=False}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
+
+</head>
+<body>
+
+
+{{block center}}
+
+<h2>Touchstone Upload</h2>
+{{=form}}
+<h2>Submitted Variables</h2>
+{{=BEAUTIFY(request.vars)}}
+<h2>Errors in Form</h2>
+{{=BEAUTIFY(form.errors)}}
+
+{{end}}
+
+{{block right_sidebar}}
+<div class="container-fluid text-center">
+  <h1>ADS</h1>
+  <h1>ADS</h1>
+  <h1>ADS</h1>
+</div>
+
+<div class="container-fluid text-center">
+</div>
+{{end}}
+
+{{block left_sidebar}}
+<div class="container-fluid text-center">
+  <h1>ADS</h1>
+  <h1>ADS</h1>
+  <h1>ADS</h1>
+</div>
+{{end}}
+
+
+</body>
+
+</html>
