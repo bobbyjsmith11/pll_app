@@ -59,6 +59,11 @@ def _():
     #     ]),
     response.menu += [
         (T('About'), False, URL('default', 'about_home')),
+            (T('Tools'), False, '#', [
+            (T('PLL Designer'), False, URL('default', 'pll_designer')),
+            (T('S Plotter'), False, URL('default', 's_plotter')),
+            ]),
+
     ]
 
 

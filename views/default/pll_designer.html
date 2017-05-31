@@ -1,6 +1,10 @@
+{{response.files.append(URL('static','js/pll_calcs.js'))}}
+{{response.files.append(URL('static','css/graph.css'))}}
+{{response.files.append(URL('static','js/graphs.js'))}}
+{{response.files.append(URL('static','css/pll_form.css'))}}
+{{extend 'layout.html'}}
 {{left_sidebar_enabled=False}}
 {{right_sidebar_enabled=False}}
-{{extend 'layout.html'}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +14,7 @@
     
 
 </head>
-  <body>
+<body>
 
 
 {{block center}}

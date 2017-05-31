@@ -1292,7 +1292,6 @@ function checkForEnter( e ) {
 
 function testFun() {
 
-
   my_url = "/pll_app/pll_calcs/callSimulatePhaseNoise?"
   dat = "freqs=" + refPhaseNoise.freqs 
         + "&refPn=" + refPhaseNoise.pns

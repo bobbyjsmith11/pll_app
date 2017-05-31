@@ -48,12 +48,20 @@
     float: right;
   }
 
-  .svg-content {
-    display: inline-block;
+  #pnGraph {
+    /* display: inline-block;
     position: absolute;
+    top: 0;
+    left: 0; */
+  }
+
+  .svg {
+    display: inline-block;
+    position: relative;
     top: 0;
     left: 0;
   }
+
 
 
 .plot-panel {

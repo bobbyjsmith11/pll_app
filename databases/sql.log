@@ -57,3 +57,161 @@ success!
 success!
 success!
 success!
+timestamp: 2017-05-23T08:33:18.949219
+CREATE TABLE "person"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512)
+);
+success!
+timestamp: 2017-05-23T08:50:52.930201
+ALTER TABLE "person" ADD "profile" TEXT;
+timestamp: 2017-05-23T08:50:53.024009
+ALTER TABLE "person" ADD "gender" CHAR(512);
+timestamp: 2017-05-23T08:50:53.122538
+ALTER TABLE "person" ADD "image" CHAR(512);
+timestamp: 2017-05-23T08:50:53.200002
+ALTER TABLE "person" ADD "married" CHAR(1);
+success!
+timestamp: 2017-05-23T22:10:29.468919
+CREATE TABLE "s_plot"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "touchstone_file" CHAR(512)
+);
+success!
+timestamp: 2017-05-27T08:48:26.922604
+ALTER TABLE "s_plot" ADD "ts_file" CHAR(512);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2017-05-27T09:20:27.637446
+CREATE TABLE "s_plot_form"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "ts_file" CHAR(512)
+);
+success!
+timestamp: 2017-05-27T09:46:23.720702
+CREATE TABLE "image"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "title" CHAR(512),
+    "ifile" CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!

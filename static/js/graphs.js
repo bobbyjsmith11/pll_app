@@ -1052,9 +1052,9 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
     // Add an SVG element with the desired dimensions and margin.
     var graph = d3.select("#pnGraph")
           .append("svg")
+          .classed("svg-content-responsive", true)
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
           .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
    
     graph.append("clipPath")
