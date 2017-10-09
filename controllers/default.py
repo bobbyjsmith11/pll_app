@@ -10,6 +10,8 @@
 # -------------------------------------------------------------------------
 import mytest
 import s_plot
+import skrf as rf
+
 
 def download():
     return response.download(request,db)
@@ -25,20 +27,7 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-
-    image_form = FORM(
-            INPUT(_name='image_title',_type='text'),
-            INPUT(_name='image_file',_type='file')
-            )
-
-    if image_form.accepts(request.vars, formname='image_form'):
-
-        image = db.image.ifile.store(image_form.vars.image_file.file, image_form.vars.image_file.filename)
-        id = db.image.insert(ifile=image,title=image_form.vars.image_title)
-
-    images = db().select(db.image.ALL)
-
-    return dict(images=images)
+    return dict()
 
 def pll_designer():
     return dict()
@@ -88,12 +77,23 @@ def s_plotter():
     form = SQLFORM(db.s_plot)
     if form.accepts(request.vars, session, form_name='s_plot'):
         response.flash = 'form accepted'
+        # print('request.vars.ts_file__class__ = ' + str(request.vars.ts_file.__class__))
+        # print('request.vars.ts_file.filename = ' + str(request.vars.ts_file.filename))
+        # print('request.vars.ts_file.file = ' + str(request.vars.ts_file.file))
+        # session.file = request.vars.ts_file.file
+        # print('session.file = ' + str(type((session.file))))
+        
+        print( request.vars.ts_file )
         print('type(request.vars.ts_file) = ' + str(type(request.vars.ts_file)))
-        print('request.vars.ts_file__clas__ = ' + str(request.vars.ts_file.__class__))
-        print('request.vars.ts_file.filename = ' + str(request.vars.ts_file.filename))
-        print('request.vars.ts_file.file = ' + str(request.vars.ts_file.file))
-        session.file = request.vars.ts_file.file
-        print('session.file = ' + str(session.file))
+
+        # for line in request.vars.ts_file:
+        #     print(line)
+        # n = rf.Network( request.vars.ts_file )
+        # # print(n.f)
+        # f = []
+        # f.extend(n.f)
+        # print('type(f) = ' + str(type(f)))
+        # d = { 'f': f }
         # d = s_plot.get_db_angle( session.file )
         # print(d)
     elif form.errors:

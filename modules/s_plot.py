@@ -35,6 +35,7 @@ def load_s2p( ):
     d = { 'f': f };
     return response.json(d)
 
+@service.json
 def get_db_angle( s2p_file ):
     """
     return the db angle values for the s2p file
