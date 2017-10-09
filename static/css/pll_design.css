@@ -6,7 +6,8 @@
 
 
 html * {
-  font-family: "HP simplified";
+  /* font-family: "HP simplified"; */
+  font-family: "Montserrat";
 }
 
 .navbar {

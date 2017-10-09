@@ -74,34 +74,35 @@ def s_plotter():
     # return dict(form=form)
 
     # form = SQLFORM(db.person)
-    form = SQLFORM(db.s_plot)
-    if form.accepts(request.vars, session, form_name='s_plot'):
-        response.flash = 'form accepted'
-        # print('request.vars.ts_file__class__ = ' + str(request.vars.ts_file.__class__))
-        # print('request.vars.ts_file.filename = ' + str(request.vars.ts_file.filename))
-        # print('request.vars.ts_file.file = ' + str(request.vars.ts_file.file))
-        # session.file = request.vars.ts_file.file
-        # print('session.file = ' + str(type((session.file))))
-        
-        print( request.vars.ts_file )
-        print('type(request.vars.ts_file) = ' + str(type(request.vars.ts_file)))
+    ### form = SQLFORM(db.s_plot)
+    ### if form.accepts(request.vars, session, form_name='s_plot'):
+    ###     response.flash = 'form accepted'
+    ###     # print('request.vars.ts_file__class__ = ' + str(request.vars.ts_file.__class__))
+    ###     # print('request.vars.ts_file.filename = ' + str(request.vars.ts_file.filename))
+    ###     # print('request.vars.ts_file.file = ' + str(request.vars.ts_file.file))
+    ###     # session.file = request.vars.ts_file.file
+    ###     # print('session.file = ' + str(type((session.file))))
+    ###     
+    ###     print( request.vars.ts_file )
+    ###     print('type(request.vars.ts_file) = ' + str(type(request.vars.ts_file)))
 
-        # for line in request.vars.ts_file:
-        #     print(line)
-        # n = rf.Network( request.vars.ts_file )
-        # # print(n.f)
-        # f = []
-        # f.extend(n.f)
-        # print('type(f) = ' + str(type(f)))
-        # d = { 'f': f }
-        # d = s_plot.get_db_angle( session.file )
-        # print(d)
-    elif form.errors:
-        response.flash = 'form has errors'
-    else:
-        response.flash = 'please fill in the form'
+    ###     # for line in request.vars.ts_file:
+    ###     #     print(line)
+    ###     # n = rf.Network( request.vars.ts_file )
+    ###     # # print(n.f)
+    ###     # f = []
+    ###     # f.extend(n.f)
+    ###     # print('type(f) = ' + str(type(f)))
+    ###     # d = { 'f': f }
+    ###     # d = s_plot.get_db_angle( session.file )
+    ###     # print(d)
+    ### elif form.errors:
+    ###     response.flash = 'form has errors'
+    ### else:
+    ###     response.flash = 'please fill in the form'
      
-    return dict(form=form)
+    # return dict(form=form)
+    return dict()
 
 def echo():
     print(request.vars.name)
