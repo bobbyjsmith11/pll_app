@@ -23,8 +23,9 @@ function plotGainPhaseMargin ( gdb, phi, freq) {
           .append("svg")
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
-          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+          .classed("svg-content-responsive", true);
+          // .attr("transform", "translate(0,0)");
+          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     var color = d3.scale.category10();
     var data = { 
@@ -321,8 +322,9 @@ function plotClosedLoop ( clRef, clVco, freq) {
           .append("svg")
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
-          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+          .classed("svg-content-responsive", true);
+          // .attr("transform", "translate(0,0)");
+          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     linedata = [];
     for ( i=0; i<freq.length; i++ ) {
@@ -600,8 +602,9 @@ function plotReferencePhaseNoise ( pn, freq) {
           .append("svg")
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
-          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+          .classed("svg-content-responsive", true);
+          // .attr("transform", "translate(0,0)");
+          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     linedata = [];
     for ( i=0; i<freq.length; i++ ) {
@@ -796,8 +799,9 @@ function plotVcoPhaseNoise ( pn, freq) {
           .append("svg")
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
-          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+          .classed("svg-content-responsive", true);
+          // .attr("transform", "translate(0,0)");
+          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
     linedata = [];
     for ( i=0; i<freq.length; i++ ) {
@@ -985,7 +989,7 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
 
     width = 800;
     height = 500;
-    m = [80, 80, 80, 180]; // margins
+    m = [80, 80, 80, 80]; // margins
     w = width - m[1] - m[3]; // width
     h  = height - m[0] - m[2]; // height
 
@@ -1054,17 +1058,10 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
           .append("svg")
           .classed("svg-content-responsive", true)
           .attr("preserveAspectRatio", "xMinYMin meet")
-          .attr("viewBox", "0 0 700 500")
-          .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+          .attr("viewBox", "0 0 700 500");
+          // .attr("transform", "translate(0,0)");
+          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
    
-    graph.append("clipPath")
-         .attr("id","rect-clip")
-      .append("rect")
-         .attr("x", 0)
-         .attr("y", 0)
-         .attr("width",w)
-         .attr("height",h);
-
     // Add the y-axis to the left
     graph.append("svg:g")
           .attr("class", "y axis")
@@ -1104,6 +1101,14 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
           .attr("transform", "translate(" + m[0] + "," + (h+m[1]) + ")")
           .call(xAxisMajor);
 
+    graph.append("clipPath")
+         .attr("id","pn-rect-clip")
+      .append("rect")
+         .attr("x", 0)
+         .attr("y", 0)
+         .attr("width",w)
+         .attr("height",h);
+
     // Add the line by appending an svg:path element with the data line we created above
     // do this AFTER the axes above so that the line is above the tick-lines
     
@@ -1131,7 +1136,7 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
               .attr("id", d)
               .attr("d", pnLine(data[d]) )
               .attr("fill", "none")
-              .attr("clip-path", "url(#rect-clip)")
+              .attr("clip-path", "url(#pn-rect-clip)")
               .attr("transform", "translate(" + m[0] + "," + (m[1]) + ")")
               .style("stroke", function() {
                 return data[d].color = color(d); });

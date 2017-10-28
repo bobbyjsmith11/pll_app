@@ -8,10 +8,11 @@
 # - user is required for authentication and authorization
 # - download is for downloading files uploaded in the db (does streaming)
 # -------------------------------------------------------------------------
-import mytest
-import s_plot
-import skrf as rf
 
+import os
+import uuid
+import s_plot
+import skrf 
 
 def download():
     return response.download(request,db)
@@ -32,77 +33,131 @@ def index():
 def pll_designer():
     return dict()
 
-def s_plotter():
-     
-    # form = SQLFORM(db.s_plot)
-    # if form.process().accepted:
-    #     response.flash = 'form accepted'
-    #     print(form.vars.ts_file)
-    #     s = s_plot.get_db_angle( form.vars.ts_file )
-    #     print(s)
-    # elif form.errors:
-    #     response.flash = 'form has errors'
-    # return dict(form=form)
+def test_file_upload():
+    # ts_form = FORM(
+    #                 INPUT(_name='touchstone_title', _type='text'),
+    #                 INPUT(_name='touchstone_file', _type='file')
+    #               )
 
-    # if form.process(session=None, formname='touchstone_load').accepted:
+    ts_form = FORM(
+        INPUT(_name='file_form',_type='hidden', _value="file_form"),
+        TABLE(TR(TH('Upload new file')),
+        TR(TD(INPUT(_class='upload', _name='_file', _type='file' ))),
+        TR(TD(INPUT(_type='submit', _value='Upload') )) ))
+    if ts_form.accepts(request.vars, session, formname='ts_file'):
+        # print('request.vars = ' + str(request.vars))
+        # session.touchstone_file = ts_form.vars.file_form
+        # print('session = ' + str(session))
+        # print('ts_form.vars.file = ' + str(ts_form.vars.file))
+        # print('ts_form.vars.keys() = ' + str(ts_form.vars.keys()))
+        #
+        #  these next two lines reference the same thing
+        # print('ts_form.vars["_file"] = ' + str(ts_form.vars['_file']))
+        # session.touchstone_file = "test variable" 
+        
+        
+        # # temp_file.close()
+        # print("temp_file.tell() = " + str(temp_file.tell()) )
+        # print("temp_file.name = " + str(temp_file.name) )
+        # session.touchstone_file = ts_form.vars._file.file
+
+        # print('request.vars["_file"] = ' + str(request.vars["_file"]) )
+        print("ts_form.vars._file.__dict__ = " + str(ts_form.vars._file.__dict__))
+        # print("ts_form.vars.file.value = " + str(ts_form.vars.file.value))
+        # print("ts_form.vars._file = " + str(ts_form.vars._file))
+        # # fo.write( ts_form.vars.file )
+        # # fo.close()
+        # print("ts_form.vars._file.filename = " + str(ts_form.vars._file.filename))
+        # print("ts_form.vars._file.file = " + str(ts_form.vars._file.file))
+
+        # fo = open( ts_form.vars["_file"], 'r' )
+        # print( "type(fo) = " + str(type(fo)))
+        # session.touchstone_file = ts_form.vars["_file"]
+        # print('session.touchstone_file = ' + str(session.touchstone_file) )
+        
+    else:
+        print("form.errors = " + str(ts_form.errors))
+
+
+    return dict(form=ts_form)
+
+def s_plotter():
+    
+    # form=SQLFORM(db.touchstone_file)
+    # if form.process(session=None, formname='ts_form').accepted:
     #     response.flash = 'form accepted'
-    # elif form.errors:
-    #     response.flash = 'form has errors'
-    # else:
-    #     response.flash = 'please fill the form'
-    # # Note: no form instance is passed to the view
-    # return dict()    
- 
-    # form = SQLFORM(db.person)
-    # if form.process(session=None, formname='test').accepted:
-    #     response.flash = 'form accepted'
+    #     filepath = os.path.join(request.folder, 'uploads', form.vars.ts_file)
+    #     return dict( ts_form.var.ts_file )
     # elif form.errors:
     #     response.flash = 'form has errors'
     # else:
     #     response.flash = 'please fill in the form'
-    # return dict()
 
-    # form=SQLFORM.factory(
-    #         Field('ts_file', 'upload', requires=[IS_NOT_EMPTY(),IS_UPLOAD_FILENAME(extension="s2p")]))
-    # if form.process().accepted:
-    #     response.flash = 'form accepted'
-    #     session.ts_file = form.vars.ts_file
-    #     print('session.ts_file = ' + str(session.ts_file))
-    #     # s = s_plot.get_db_angle( form.vars.ts_file )
-    # elif form.errors:
-    #     response.flash = 'form has errors'
-    # return dict(form=form)
+    # 
+    # return dict() 
 
-    # form = SQLFORM(db.person)
-    ### form = SQLFORM(db.s_plot)
-    ### if form.accepts(request.vars, session, form_name='s_plot'):
-    ###     response.flash = 'form accepted'
-    ###     # print('request.vars.ts_file__class__ = ' + str(request.vars.ts_file.__class__))
-    ###     # print('request.vars.ts_file.filename = ' + str(request.vars.ts_file.filename))
-    ###     # print('request.vars.ts_file.file = ' + str(request.vars.ts_file.file))
-    ###     # session.file = request.vars.ts_file.file
-    ###     # print('session.file = ' + str(type((session.file))))
-    ###     
-    ###     print( request.vars.ts_file )
-    ###     print('type(request.vars.ts_file) = ' + str(type(request.vars.ts_file)))
+    # file_form = FORM(
+    #             INPUT(_name='file_form', _type='hidden', _value='file_form'),
+    #             TABLE(TR(TH('upload s-parameters file')),
+    #                 TR(TD(INPUT(_class='upload', _name='file', _type='file'))),
+    #                 TR(TD(INPUT(_type='submit', _value='upload') )) ))
+  
+    # file_data = ""
+    # if file_form.accepts(request.vars, session, formname='file_form'):
+    #     # print("type(request.vars) = " + str(type(request.vars)) )
+    #     # print("request.vars.keys() = " + str(request.vars.keys()) )
+    #     # print("request.vars['file'].file = " + str(request.vars['file'].file) )
+    #     file_data =  request.vars['file'].file.read()
+    #     
 
-    ###     # for line in request.vars.ts_file:
-    ###     #     print(line)
-    ###     # n = rf.Network( request.vars.ts_file )
-    ###     # # print(n.f)
-    ###     # f = []
-    ###     # f.extend(n.f)
-    ###     # print('type(f) = ' + str(type(f)))
-    ###     # d = { 'f': f }
-    ###     # d = s_plot.get_db_angle( session.file )
-    ###     # print(d)
-    ### elif form.errors:
-    ###     response.flash = 'form has errors'
-    ### else:
-    ###     response.flash = 'please fill in the form'
-     
-    # return dict(form=form)
-    return dict()
+    # return dict(form=file_form, file_data=file_data)
+    #
+    #
+    ## using the serialized Web2py version of the form - this at least uploads the file
+    file_name=None
+    file_data=None
+    form = SQLFORM(db.s_plot_form)
+    if form.validate():
+        file_id =  form.vars.id
+        response.flash = 'form accepted'
+        filepath = os.path.join(request.folder, 'uploads', form.vars.ts_file)
+        file_name = form.vars.ts_file.strip()
+        db.s_plot_form.insert( ts_file=form.vars.ts_file,
+                               storage_path=filepath,
+                               file_name=file_name,
+                               description=form.vars.description
+                               )
+
+        file_list = db(db.s_plot_form)
+        session.file_name = file_name
+        session.storage_path = filepath
+        session.file_id = file_id
+        file_data = open( session.storage_path, 'rb').read()
+        # file_data = form.vars.ts_file 
+
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill in form'
+    return dict(form=form, file_data=file_data)
+
+
+@service.json
+def load_s2p( ):
+    """
+    """
+    # file_name = request.vars.file_name.strip()
+    data = request.vars.file_data
+    # print( data )
+    #
+    n = skrf.Network( session.storage_path )
+    freq = []
+    freq.extend(n.f)
+    d = { 'f': freq }
+
+    return response.json(d)
+
+
 
 def echo():
     print(request.vars.name)

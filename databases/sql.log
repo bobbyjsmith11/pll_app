@@ -365,3 +365,61 @@ CREATE TABLE "person"(
     "profile" TEXT,
     "image" CHAR(512)
 );
+timestamp: 2017-10-14T02:38:33.561774
+CREATE TABLE "image"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "title" CHAR(512),
+    "tfile" CHAR(512)
+);
+timestamp: 2017-10-14T02:39:33.074126
+CREATE TABLE "timage"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "title" CHAR(512),
+    "tfile" CHAR(512)
+);
+success!
+timestamp: 2017-10-14T02:57:43.449754
+CREATE TABLE "image"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "title" CHAR(512),
+    "tfile" CHAR(512)
+);
+timestamp: 2017-10-15T05:34:09.383459
+CREATE TABLE "s_plot_form"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "ts_file" CHAR(512)
+);
+timestamp: 2017-10-22T15:08:12.406014
+CREATE TABLE "ts_file"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "touchstone_title" CHAR(512),
+    "touchstone_file" CHAR(512)
+);
+success!
+timestamp: 2017-10-23T06:14:14.697082
+CREATE TABLE "s_plot_form"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "ts_file" CHAR(512),
+    "storage_path" CHAR(512),
+    "description" CHAR(512)
+);
+success!
+timestamp: 2017-10-28T08:59:36.621809
+ALTER TABLE "s_plot_form" ADD "file_name" CHAR(512);
+timestamp: 2017-10-28T09:00:29.318707
+ALTER TABLE "s_plot_form" ADD "file_name" CHAR(512);
+timestamp: 2017-10-28T09:02:17.944351
+ALTER TABLE "s_plot_form" ADD "file_name" CHAR(512);
+timestamp: 2017-10-28T09:02:28.149793
+ALTER TABLE "s_plot_form" ADD "file_name" CHAR(512);
+timestamp: 2017-10-28T09:02:55.197549
+ALTER TABLE "s_plot_form" ADD "file_name" CHAR(512);
+timestamp: 2017-10-28T09:09:04.711709
+CREATE TABLE "s_plot_form"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "ts_file" CHAR(512),
+    "file_name" CHAR(512),
+    "storage_path" CHAR(512),
+    "description" CHAR(512)
+);
+success!

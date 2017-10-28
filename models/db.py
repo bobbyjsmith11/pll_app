@@ -131,23 +131,24 @@ auth.settings.reset_password_requires_verification = True
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
 #
-#
-# db.define_table('person', 
-#                 Field('name', requires=IS_NOT_EMPTY()),
-#                 Field('married', 'boolean'),
-#                 Field('gender', requires=IS_IN_SET(['male','female','other'])),
-#                 Field('profile', 'text'),
-#                 Field('image', 'upload')
-#                 )
-# 
-# db.define_table('s_plot',
-#                 Field('ts_file','upload', requires=IS_NOT_EMPTY())
-#                 )
-# 
-# db.define_table('image',
-#                 Field('title'),
-#                 Field('ifile','upload'),
-#                 format = '%(title)s')
 
+db.define_table('ts_file',
+                Field('touchstone_title'), 
+                Field('touchstone_file','upload', 
+                requires=IS_NOT_EMPTY()),
+                migrate=False,
+                format= '%(title)s'
+                )
+
+
+## works with serialized Web2py version
+db.define_table('s_plot_form',
+                Field('ts_file','upload', 
+                requires=IS_NOT_EMPTY()),
+                Field('file_name','string'),
+                Field('storage_path','string'),
+                Field('description', 'string'),
+                # migrate=False
+                )
 
 

@@ -1639,13 +1639,3 @@ def callGetInterpolatedPhaseNoise():
     return response.json(d)
 
 
-@service.json
-def load_s2p( ):
-    """
-    """
-    f =        str(request.vars.file)
-
-    print(f)
-    d = { 'f': f };
-    return response.json(d)
-

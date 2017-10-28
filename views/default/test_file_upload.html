@@ -1,0 +1,41 @@
+{{response.files.append(URL('static','css/s_plotter.css'))}}
+{{response.files.append(URL('static','js/s_plot.js'))}}
+{{extend 'layout.html'}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
+
+</head>
+<body>
+
+
+<div class="container-fluid text-center">
+  <div>
+    <h2>Plot Touchstone</h2>
+        {{=form}}
+        <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
+  </div>
+  <div id="form_vars_file" >
+    <h2>request.vars</h2>
+      {{=BEAUTIFY(request.vars)}}
+  </div>
+  <div id="session_vars" >
+    <h2>session.vars</h2>
+      {{=BEAUTIFY(session.vars)}}
+  </div>
+  <div id="accepted_vars" >
+    <h2>accepted variables</h2>
+      {{=(form.vars)}}
+  </div>
+  <div id="errors_in_form" >
+    <h2>form errors</h2>
+      {{=BEAUTIFY(form.errors)}}
+  </div>
+</div>
+
+</body>
+
+</html>

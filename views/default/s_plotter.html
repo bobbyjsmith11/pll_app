@@ -16,9 +16,36 @@
 
 {{block center}}
 
-<h2>Touchstone Upload</h2>
-{{=form}}
+    <!-- form action = "#" method="post" enctype="multipart/form-data"/>
+      <input name="_formname" type="hidden" value="ts_form"/>
+      <input class="upload" type="file" id="file" name="file" />
+      <input type="submit" id="plotBtn" class="btn btn-default" OnClick="plot()" />
+    </form -->
 
+<div class="container-fluid text-center">
+  <div>
+    <h2>Touchstone Upload</h2>
+        {{=form}}
+        <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
+  </div>
+  <div id="s2p data" >
+    <textarea id="file_data" rows=50 cols=100 >
+      {{=file_data}}
+    </textarea>
+  </div>
+  <div id="form_vars_file" >
+    <h2>submitted variables</h2>
+      {{=BEAUTIFY(request.vars)}}
+  </div>
+  <div id="accepted_vars" >
+    <h2>accepted variables</h2>
+      {{=(form.vars)}}
+  </div>
+  <div id="errors_in_form" >
+    <h2>form errors</h2>
+      {{=BEAUTIFY(form.errors)}}
+  </div>
+</div>
 {{end}}
 
 {{block right_sidebar}}
