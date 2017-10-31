@@ -987,7 +987,7 @@ function plotPhaseNoise ( freq, refPn, vcoPn, icPn, comp) {
 
     // define dimensions of graph
 
-    width = 800;
+    width = 700;
     height = 500;
     m = [80, 80, 80, 80]; // margins
     w = width - m[1] - m[3]; // width

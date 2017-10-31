@@ -1,61 +1,47 @@
 @charset "UTF-8";
 
-.btn {
-  /* background: #FFFFFF; */
-  /* background: #3399FF; */
+path {
+  stroke-width: 2;
+  fill: none;
 }
 
-/*
-html,
-body {
-  background: linear-gradient(to bottom, #FFFFC3 0%, #4AFFC3 100%);
-}
-*/
+  .axis path,
+    .axis line {
+      fill: none;
+      stroke: grey;
+      stroke-width: 1;
+      shape-rendering: crispEdges;
+    }
 
-.upload-btn {
-  color: #000000;
-  /* background-color: #F89406; */
-  background-color: #FF3333;
-  border: none;
-}
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  border: 1px solid black;
+  /*padding-bottom: 100%;*/
+  vertical-align: middle;
+  overflow: hidden;
+  min-width: 500px;
+  max-width: 750px;  */
 
-.upload-btn:hover,
-.upload-btn:focus,
-.upload-btn:active,
-.upload-btn.active {
-  color: #ffffff;
-  background-color: #FF3333;
-  border: none;
 }
 
-
-.upload-panel {
-  text-align: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  margin-top: 30px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-@media (min-width: 768px) {
-  .main-container {
-    width: 100%;
+  .svg {
+    display: inline-block;
+    position: relative;
+    top: 0;
+    left: 0;
   }
-}
 
-@media (min-width: 992px) {
-  .container {
-    width: 450px;
-  }
-}
 
-/*
-#upload-input {
-  display: none;
-}
-*/
 
+.plot-panel {
+  display: inline-block;
+  min-width: 850px;
+  max-width: 950px; 
+  width: 850px;
+  height: 600px; 
+}
 
 
 

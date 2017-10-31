@@ -67,10 +67,10 @@
           <h1 style="color:white">PLLDesign.com</h1>
         </div-->
         <div class="collapse navbar-collapse navbar-ex1-collapse">
-          <ul class="nav navbar-nav navbar-right">
+          <!-- ul class="nav navbar-nav navbar-right">
             <{{='auth' in globals() and
               auth.navbar('Welcome',mode='dropdown') or ''}}>
-          </ul>
+          </ul -->
           {{if response.menu:}}
           {{=MENU(response.menu, _class='nav navbar-nav',li_class='dropdown',ul_class='dropdown-menu')}}
           {{pass}}

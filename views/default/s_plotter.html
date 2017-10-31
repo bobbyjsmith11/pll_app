@@ -16,32 +16,62 @@
 
 {{block center}}
 
-    <!-- form action = "#" method="post" enctype="multipart/form-data"/>
-      <input name="_formname" type="hidden" value="ts_form"/>
-      <input class="upload" type="file" id="file" name="file" />
-      <input type="submit" id="plotBtn" class="btn btn-default" OnClick="plot()" />
-    </form -->
 
 <div class="container-fluid text-center">
+
   <div>
     <h2>Touchstone Upload</h2>
         {{=form}}
-        <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
+      <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
   </div>
+
+  <div class="panel with-nav-tabs panel-default plot-panel">
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#logMagDiv">dB/angle</a></li>
+      <li class="hidden"><a data-toggle="tab" href="#magAngleDiv">magnitude/angle</a></li>
+      <li class="hidden"><a data-toggle="tab" href="#realImageDiv">real/imaginary</a></li>
+      <li class="hidden"><a data-toggle="tab" href="#smithChartDiv">Smith Chart</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="logMagDiv" class="tab-pane fade in">
+        <div id="logMagPlot" class="svg-container">
+        </div>
+      </div>
+
+      <div id="magAngleDiv" class="tab-pane fade in">
+        <div id="magAnglePlot" class="svg-container">
+        </div>
+      </div>
+
+      <div id="realImageDiv" class="tab-pane fade in">
+        <div id="realImagPlot" class="svg-container">
+        </div>
+      </div>
+
+      <div id="smithChartDiv" class="tab-pane fade in">
+        <div id="smithChartPlot" class="svg-container">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <div id="s2p data" >
-    <textarea id="file_data" rows=50 cols=100 >
+    <textarea id="file_data" rows=50 cols=120 >
       {{=file_data}}
     </textarea>
   </div>
-  <div id="form_vars_file" >
+
+  <div id="form_vars_file" class="hidden">
     <h2>submitted variables</h2>
       {{=BEAUTIFY(request.vars)}}
   </div>
-  <div id="accepted_vars" >
+  <div id="accepted_vars" class="hidden">
     <h2>accepted variables</h2>
       {{=(form.vars)}}
   </div>
-  <div id="errors_in_form" >
+  <div id="errors_in_form" class="hidden">
     <h2>form errors</h2>
       {{=BEAUTIFY(form.errors)}}
   </div>
@@ -49,22 +79,9 @@
 {{end}}
 
 {{block right_sidebar}}
-<div class="container-fluid text-center">
-  <h1>ADS</h1>
-  <h1>ADS</h1>
-  <h1>ADS</h1>
-</div>
-
-<div class="container-fluid text-center">
-</div>
 {{end}}
 
 {{block left_sidebar}}
-<div class="container-fluid text-center">
-  <h1>ADS</h1>
-  <h1>ADS</h1>
-  <h1>ADS</h1>
-</div>
 {{end}}
 
 

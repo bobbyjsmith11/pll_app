@@ -13,11 +13,11 @@ path {
       shape-rendering: crispEdges;
     }
 
-
 .svg-container {
   display: inline-block;
   position: relative;
   width: 100%;
+  border: 1px solid black;
   /* padding-bottom: 100%; */
   overflow: hidden;
 
@@ -29,3 +29,4 @@ path {
   top: 0;
   left: 0;
 }
+

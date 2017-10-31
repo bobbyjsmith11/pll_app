@@ -145,9 +145,6 @@ db.define_table('ts_file',
 db.define_table('s_plot_form',
                 Field('ts_file','upload', 
                 requires=IS_NOT_EMPTY()),
-                Field('file_name','string'),
-                Field('storage_path','string'),
-                Field('description', 'string'),
                 # migrate=False
                 )
 
