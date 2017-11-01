@@ -8,7 +8,8 @@
 # - user is required for authentication and authorization
 # - download is for downloading files uploaded in the db (does streaming)
 # -------------------------------------------------------------------------
-
+import matplotlib
+matplotlib.use('agg')
 import os
 import s_plot
 import skrf 
