@@ -136,7 +136,7 @@ db.define_table('ts_file',
                 Field('touchstone_title'), 
                 Field('touchstone_file','upload', 
                 requires=IS_NOT_EMPTY()),
-                migrate=False,
+                migrate=True,
                 format= '%(title)s'
                 )
 
