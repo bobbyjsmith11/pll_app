@@ -84,10 +84,8 @@
     <!-- Begin page content -->
     <div class="container-fluid main-container">
       {{if left_sidebar_enabled:}}
-        <div class="col-md-2 left-sidebar" style="background-color:steelblue">
+      <div class="col-md-2 left-sidebar">
             {{block left_sidebar}}
-            <h3>Left Sidebar</h3>
-            <p></p>
             {{end}}
         </div>
       {{pass}}
@@ -99,10 +97,8 @@
       </div>
 
       {{if right_sidebar_enabled:}}
-        <div class="col-md-2" style="background-color:steelblue">
+        <div class="col-md-2">
             {{block right_sidebar}}
-            <h3>Right Sidebar</h3>
-            <p></p>
             {{end}}
         </div>
       {{pass}}
@@ -112,10 +108,13 @@
     {{block footer}} <!-- this is default footer -->      
     <footer class="footer">
       <div class="container-fluid">
-        <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
-          <div id="poweredBy" class="pull-right">
+        <!-- div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div -->
+        <div id="contact-details" class="center">
+          <p><a href="mail-to:bobby.smith@plldesign.com">{{=myconf.get('app.email')}}</p>
+        </div>
+          <!-- div id="poweredBy" class="pull-right">
             {{=T('Powered by')}}
-            <a href="http://www.web2py.com/">web2py</a>
+            <a href="http://www.web2py.com/">web2py</a -->
           </div>
       </div>
     </footer>

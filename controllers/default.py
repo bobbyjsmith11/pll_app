@@ -28,7 +28,7 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-    redirect(URL('pll_designer'))
+    # redirect(URL('pll_designer'))
     return dict()
 
 def pll_designer():
@@ -58,7 +58,7 @@ def s_plotter():
     ## using the serialized Web2py version of the form - this at least uploads the file
     file_data=""
     form = SQLFORM.factory(db.s_plot_form)
-        
+    # session.clear()
     if form.validate():
         pass 
         response.flash = 'form accepted'
@@ -73,15 +73,17 @@ def s_plotter():
             session.network = skrf.Network( filepath )   # pass in the file you just created
             session.file_data = file_data
         except Exception as e:
+            session.file_data = ""
             print(e)
-        print("session.network = " + str(session.network))
+        # print("session.network = " + str(session.network))
         os.remove( filepath )
 
     elif form.errors:
+        session.file_data = ""
         response.flash = 'form has errors'
     else:
         response.flash = 'please fill in form'
-    return dict(form=form, file_data=file_data)
+    return dict(form=form, file_data=session.file_data)
 
 
 def echo():

@@ -38,7 +38,6 @@ def getLogMagnitude( ):
             ext = ".s" +str(i) + "p"
     fname = "temp_file" + ext
     fo = open(fname, "wb")
-    # fo.write( data)
     fo.write( session.file_data )
     fo.close()
     try:
@@ -47,16 +46,6 @@ def getLogMagnitude( ):
         print(e)
     os.remove( fname )          # delete this file
 
-    # print("session.number_of_ports = " + str(session.number_of_ports))
-    # d = { 'f':                  session.f.tolist(),
-    #       'number_of_ports':    int(session.number_of_ports)
-    #       }
-    # print("session.network = " + str(session.network))
-    # # print(d) 
-    # for j in range(session.number_of_ports):      # j is second port
-    #     for k in range(session.number_of_ports):  # k is first port
-    #         tmp = []
-    #         d["s"+str(j+1)+str(k+1)+"db"] = session.s_db[:,j,k].tolist()
     d = { 'f':                  n.f.tolist(),
           'number_of_ports':    int(n.number_of_ports)
           }

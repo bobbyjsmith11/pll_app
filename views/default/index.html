@@ -1,6 +1,6 @@
 {{response.files.append(URL('static','css/index.css'))}}
-{{left_sidebar_enabled=False}}
-{{right_sidebar_enabled=False}}
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=True}}
 {{extend 'layout.html'}}
 <!DOCTYPE html>
 <html lang="en">
@@ -17,29 +17,54 @@
 
 <div class="container-fluid text-center">
   <h1>Overview</h1>
-  <p>There are two free tools available on this website</p>
-   <h2>PLL Designer</h2>
+  <p>This website is a collection of free tools to help in the design of RF circuits. Any suggestions or bug fixes are greatly apprecaiated (see contact info in footer).</p>
+  <p>This web application is powered by <a href="http://www.web2py.com/">web2py</a>--a very easy-to-use, python-based web framework.</p>
+  <div>
+   <h1>PLL Designer</h1>
     <p>This tool is for designing and simulating Phase-Locked Loops (PLL). 
     Users can design the loop filter components based on desired loop bandwidth and
     phase margin. Phase noise is also simulated based on constants found in 
     most data sheets for PLL ICs.</p>
-    <h3>Feature List</h3>
+    <p>All of the PLL design calculations are of my own design and were written in python. 
+    However, some of the formulas and simulations are based on <a href="http://www.ti.com/tool/PLL_BOOK">Dean Banerjee's fantastic book on phase-locked loops</a></p>
+    <h3>Implemented Features</h3>
     <ul>
-      <li>loop filter design</li>
-      <ul>
-        <li>2nd order passive</li>
-        <li>3rd order passive</li>
-        <li>4th order passive</li>
-        <li>2nd order active (not yet supported)</li>
-        <li>3rd order active (not yet supported)</li>
-        <li>4th order active (not yet supported)</li>
-      </ul>
+      <li>2nd order passive loop filter</li>
+      <li>3rd order passive loop filter</li>
+      <li>4th order passive loop filter (well, it kinda works)</li>
       <li>phase noise simulation</li>
     </ul>
+    <h3>Features on the Roadmap</h3>
+    <ul>
+      <li>2nd order active loop filter</li>
+      <li>3rd order active loop filter</li>
+      <li>4th order active loop filter</li>
+      <li>lock loop filter component values while changing others</li>
+    </ul>
+  </div>
+  <div>
    <h2>S Plotter</h2>
-   <p>With the S Plotter, users can upload touchstone files and view them in the text area.
-   You can choose which format to display the s-parameter data: dB/angle, magnituge/angle or real/imaginary (coming soon).
+   <p>With the S Plotter, users can upload touchstone data and view it in the text area. The data can be viewed in the text area and plotted 
+   in log-magnitude format (currently). Graphs allow for dynamic zooming and rescaling and a marker with trace values follows the mouse cursor.
    </p>
+   <p>The S-Plotter application makes heavy use of the <a href="http://scikit-rf-web.readthedocs.io/#">Scikit-RF</a> python module.
+  </p>
+    <h3>Implemented Features</h3>
+    <ul>
+      <li>log-magnitude plot</li>
+      <li>zooming, rescaling and resetting of scales</li>
+      <li>marker follows cursor</li>
+    </ul>
+    <h3>Features on the Roadmap</h3>
+    <ul>
+      <li>save marker and marker delta</li>
+      <li>export png/pdf</li>
+      <li>export touchstone data in desired format (db/mag/real-imag)</li>
+      <li>magnitude-angle plot</li>
+      <li>Smith chart</li>
+      <li>impedance matching</li>
+    </ul>
+  </div>
 </div>
 {{end}}
 

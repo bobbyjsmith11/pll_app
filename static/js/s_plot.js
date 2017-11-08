@@ -2,6 +2,11 @@ window.onload = function() {
   // plotLogMag();
 };
 
+registerKeyboardHandler = function(callback) {
+  var callback = callback;
+  d3.select(window).on("keydown", callback);  
+};
+
 function plot() {
   var s = $("#file_data").text();
   s = encodeURIComponent( s );  // needed to escape any JSON special characters like "#"
@@ -19,6 +24,7 @@ function plot() {
                 dat = data;
                 // console.log(data);
                 plotLogMag( data_dict=data );
+                document.getElementById("plotBtn").disabled = true;
             },
             error: function (result) {
             }
@@ -342,15 +348,60 @@ function zoomed() {
       })
       .style("stroke", function(d) {
         return color(d.name);
-      })
-      .attr("clip-path", "url(#rect-clip)");
+      });
 
     document.getElementById("logMagDiv").style.display = 'none';
     document.getElementById("logMagDiv").style.display = 'block';
 };
 
 
+function resetScale() {
+
+    var fstart = data[0].f;
+    var fstop = data[data.length - 1].f;
+    x_scale.domain([fstart, fstop]);
+
+    var max_ar = [];
+    var min_ar = [];
+
+    for (var propt in data[0]) {
+      if (propt != "f" && propt != "number_of_ports"){
+        max_ar.push( math.max.apply(math,data.map( function(o){return o[propt]})) );
+        min_ar.push( math.min.apply(math,data.map( function(o){return o[propt]})) );
+      };
+    };
+
+    var max_y = math.max(max_ar);
+    var min_y = math.min(min_ar);
+    max_y = math.ceil(max_y/10)*10;
+    min_y = math.floor(min_y/10)*10;
+
+    // GLOBAL
+    y_scale.domain([min_y,max_y]);
   
-  
+    graph.select(".x.axis")
+      .transition()
+      .duration(500)
+      .call(xAxis);
+    graph.select(".y.axis")
+      .transition()
+      .duration(500)
+      .call(yAxis);
+
+    param.selectAll("path")
+      .attr("class", "line")
+      .transition()
+      .duration(500)
+      .attr("d", function(d) {
+        return logLine(d.values);
+      })
+      .style("stroke", function(d) {
+        return color(d.name);
+      });
+
+
+    document.getElementById("logMagDiv").style.display = 'none';
+    document.getElementById("logMagDiv").style.display = 'block';
+}; 
   
   

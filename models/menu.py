@@ -30,14 +30,14 @@ response.google_analytics_id = None
 # this is the main application menu add/remove items as required
 # ----------------------------------------------------------------------------------------------------------------------
 
-# response.menu = [
-#     (T('Home'), False, URL('default', 'index'), [])
-# ]
-#
-response.menu += [
-    (T('PLL Designer'), False, URL('default', 'pll_designer')),
-    (T('S Plotter'), False, URL('default', 's_plotter')) 
+response.menu = [
+    (T('Home'), False, URL('default', 'index'), [])
 ]
+#
+# response.menu += [
+#     (T('PLL Designer'), False, URL('default', 'pll_designer')),
+#     (T('S Plotter'), False, URL('default', 's_plotter')) 
+# ]
 
 DEVELOPMENT_MENU = True
 
@@ -55,18 +55,18 @@ def _():
     # ------------------------------------------------------------------------------------------------------------------
     # useful links to internal and external resources
     # ------------------------------------------------------------------------------------------------------------------
-    # response.menu += [
-    #     (T('About'), False, URL('default', 'about_home')),
-    #         (T('Tools'), False, '#', [
-    #         (T('PLL Designer'), False, URL('default', 'pll_designer')),
-    #         (T('S Plotter'), False, URL('default', 's_plotter')),
-    #         # (T('file test'), False, URL('default', 'test_file_upload')),
-    #         ]),
+    response.menu += [
+        # (T('About'), False, URL('default', 'about_home')),
+            (T('Tools'), False, '#', [
+            (T('PLL Designer'), False, URL('default', 'pll_designer')),
+            (T('S Plotter'), False, URL('default', 's_plotter')),
+            # (T('file test'), False, URL('default', 'test_file_upload')),
+            ]),
 
     # response.menu += [
     #     (T('PLL Designer'), False, URL('default', 'pll_designer')),
     #     (T('S Plotter'), False, URL('default', 's_plotter')) 
-    # ]
+    ]
 
 
 if DEVELOPMENT_MENU:
