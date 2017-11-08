@@ -28,7 +28,7 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-    redirect(URL('pll_designer'))
+    # redirect(URL('pll_designer'))
     return dict()
 
 def pll_designer():
