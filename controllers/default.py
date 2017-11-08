@@ -13,7 +13,6 @@ matplotlib.use('agg')
 import os
 import s_plot
 import skrf 
-import cStringIO
 
 def download():
     return response.download(request,db)
@@ -68,6 +67,14 @@ def s_plotter():
         file_list = db(db.s_plot_form)
         ftemp = open( filepath, 'rb')
         file_data = ftemp.read()
+        ftemp.close()
+
+        try:
+            session.network = skrf.Network( filepath )   # pass in the file you just created
+            session.file_data = file_data
+        except Exception as e:
+            print(e)
+        print("session.network = " + str(session.network))
         os.remove( filepath )
 
     elif form.errors:
@@ -76,35 +83,6 @@ def s_plotter():
         response.flash = 'please fill in form'
     return dict(form=form, file_data=file_data)
 
-
-@service.json
-def load_s2p( ):
-    """
-    """
-    # file_name = request.vars.file_name.strip()
-    data = request.vars.file_data
-    data = data.replace("'","").strip()
-
-    # skrf needs the correct file extension
-    ext = ".s1p"
-    for i in range(10):     # supports up to 10 port network
-        if "S" + str(i) + "1" in data:
-            ext = ".s" +str(i) + "p"
-    fname = "temp_file" + ext
-    fo = open(fname, "wb")
-    fo.write( data)
-    fo.close()
-    n = skrf.Network( fname )   # pass in the file you just created
-    os.remove( fname )          # delete this file
-    d = { 'f':                  n.f.tolist(),
-          'number_of_ports':    int(n.number_of_ports)
-          }
-    
-    for j in range(n.number_of_ports):      # j is second port
-        for k in range(n.number_of_ports):  # k is first port
-            tmp = []
-            d["s"+str(j+1)+str(k+1)+"db"] = n.s_db[:,j,k].tolist()
-    return response.json(d)
 
 def echo():
     print(request.vars.name)

@@ -8,8 +8,11 @@
 from gluon.tools import Service
 service = Service(globals())
 
+import matplotlib
+matplotlib.use('agg')
 import numpy as np
-import skrf as rf
+import skrf
+import os
 
 def call():
     """
@@ -21,34 +24,46 @@ def call():
     # session.forget()
     return service()
 
+
 @service.json
-def load_s2p( ):
+def getLogMagnitude( ):
     """
     """
-    f =        str(request.vars.file)
-    # n = skrf.Network(f)
-    print('type(f) = ' + str(type(f)))
-    # print('f.name = ' + str(f.name))
-    print('f = ' + str(f))
-    # print(f)
-    # print(type(f))
-    d = { 'f': f };
+    # data = request.vars.file_data
+    # data = data.replace("'","").strip()
+
+    ext = ".s1p"
+    for i in range(10):     # supports up to 10 port network
+        if "S" + str(i) + "1" in session.file_data:
+            ext = ".s" +str(i) + "p"
+    fname = "temp_file" + ext
+    fo = open(fname, "wb")
+    # fo.write( data)
+    fo.write( session.file_data )
+    fo.close()
+    try:
+        n = skrf.Network( fname )   # pass in the file you just created
+    except Exception as e:
+        print(e)
+    os.remove( fname )          # delete this file
+
+    # print("session.number_of_ports = " + str(session.number_of_ports))
+    # d = { 'f':                  session.f.tolist(),
+    #       'number_of_ports':    int(session.number_of_ports)
+    #       }
+    # print("session.network = " + str(session.network))
+    # # print(d) 
+    # for j in range(session.number_of_ports):      # j is second port
+    #     for k in range(session.number_of_ports):  # k is first port
+    #         tmp = []
+    #         d["s"+str(j+1)+str(k+1)+"db"] = session.s_db[:,j,k].tolist()
+    d = { 'f':                  n.f.tolist(),
+          'number_of_ports':    int(n.number_of_ports)
+          }
+    for j in range(n.number_of_ports):      # j is second port
+        for k in range(n.number_of_ports):  # k is first port
+            tmp = []
+            d["s"+str(j+1)+str(k+1)+"db"] = n.s_db[:,j,k].tolist()
     return response.json(d)
 
-
-@service.json
-def get_db_angle( s2p_file ):
-    """
-    return the db angle values for the s2p file
-    """
-    print("get_db_angle")
-    n = skrf.Network(s2p_file)
-    # print(s2p_file)
-    # print( type(s2p_file) )
-    print( n.f )
-    return 
-    # f = []
-    # f.extend(n.f)
-    # print(f)
-    # return f
 

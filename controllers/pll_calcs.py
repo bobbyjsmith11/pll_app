@@ -9,6 +9,8 @@ from gluon.tools import Service
 service = Service(globals())
 
 import numpy as np
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pylab as plt
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d

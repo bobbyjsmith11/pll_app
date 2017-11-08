@@ -113,7 +113,7 @@ function synthPll () {
 
 function simulatePll( ) {
   my_url = "/pll_app/pll_calcs/callSimulatePll?"
-  dat = "fstart=" + 1
+  dat = "fstart=" + 0.1 
         + "&fstop=" + 100e6
         + "&ptsPerDec=" + 99
         + "&kphi=" + pll.kphi

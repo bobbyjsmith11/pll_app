@@ -43,5 +43,17 @@ path {
   height: 600px; 
 }
 
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
 
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
 
+#rect-clip {
+  fill: none;
+  pointer-events: all;
+}
