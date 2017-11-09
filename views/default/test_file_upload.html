@@ -1,41 +1,61 @@
+{{response.files.append(URL('static','css/simple-graph.css'))}}
 {{response.files.append(URL('static','css/s_plotter.css'))}}
-{{response.files.append(URL('static','js/s_plot.js'))}}
+{{response.files.append(URL('static','js/simple-graph.js'))}}
 {{extend 'layout.html'}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>One Graph</title>
   <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
-
+  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.js"></script>
 </head>
 <body>
 
-
 <div class="container-fluid text-center">
-  <div>
+  <div >
     <h2>Plot Touchstone</h2>
-        {{=form}}
-        <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
-  </div>
-  <div id="form_vars_file" >
-    <h2>request.vars</h2>
-      {{=BEAUTIFY(request.vars)}}
-  </div>
-  <div id="session_vars" >
-    <h2>session.vars</h2>
-      {{=BEAUTIFY(session.vars)}}
-  </div>
-  <div id="accepted_vars" >
-    <h2>accepted variables</h2>
-      {{=(form.vars)}}
-  </div>
-  <div id="errors_in_form" >
-    <h2>form errors</h2>
-      {{=BEAUTIFY(form.errors)}}
-  </div>
-</div>
+    <form action="" enctype="multipart/form-data" method="post">
+      <div class="file-upload">
+        <label for="upload" class="inputfile-label">Browse for touchstone file</label>
+        <input id="upload" class="inputfile" type="file" name="file-upload" />
+        <input name="submitBtn" type="submit" value="upload"/>
+      </div>
+    </form>
 
-</body>
+  </div>
+  <div >
+    <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
+  </div>
+  <div >
+  <div class="hidden">
+    <h2>Submitted Variables</h2>
+    {{=BEAUTIFY(request.vars)}}
+    <h2>Accepted Variables</h2>
+    {{=BEAUTIFY(form.vars)}}
+    <h2>Errors in form</h2>
+    {{=BEAUTIFY(form.errors)}}
+  </div>
 
+  </head>
+  <body>
+    <div id="chart1" class="chart"></div>
+    <script type="text/javascript">
+      graph = new SimpleGraph("chart1", {
+          "xmax": 60, "xmin": 0,
+          "ymax": 40, "ymin": 0, 
+          "title": "Simple Graph1",
+          "xlabel": "X Axis",
+          "ylabel": "Y Axis"  
+        });
+    </script>
+  </div>
+  <div id="s2p data" >
+    <textarea id="file_data" rows=50 cols=120 >
+      {{=file_data}}
+    </textarea>
+  </div>
+  </body>
 </html>

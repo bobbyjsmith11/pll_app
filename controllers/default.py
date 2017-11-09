@@ -35,23 +35,34 @@ def pll_designer():
     return dict()
 
 def test_file_upload():
-    # ts_form = FORM(
-    #                 INPUT(_name='touchstone_title', _type='text'),
-    #                 INPUT(_name='touchstone_file', _type='file')
-    #               )
 
-    ts_form = FORM(
-        INPUT(_name='file_form',_type='hidden', _value="file_form"),
-        TABLE(TR(TH('Upload new file')),
-        TR(TD(INPUT(_class='upload', _name='_file', _type='file' ))),
-        TR(TD(INPUT(_type='submit', _value='Upload') )) ))
-    if ts_form.accepts(request.vars, session, formname='ts_file'):
-        print("ts_form.vars._file.__dict__ = " + str(ts_form.vars._file.__dict__))
+    touchstone_form = FORM(
+                        INPUT(_name='touchstone_file', _type='file'),
+                        INPUT(_name='submitBtn', _type='submit'),
+                            )
+
+    # touchstone_form = FORM(TABLE(TR(TH(INPUT(_name='touchstone_file', _type='file', _class="upload-btn", _value="browse"))),
+    #                             TR(TH(INPUT(_name='submitBtn', _type='submit', _value='upload')))))
+
+    file_data = "upload touchstone file to plot"
+    if touchstone_form.accepts(request, session):
+        file_data = ("request.vars = " + str(request.vars))
     else:
-        print("form.errors = " + str(ts_form.errors))
+        file_data = ("touchstone_form did not accept\nrequest.vars = " + str(request.vars))
 
+    return dict(form=touchstone_form, file_data=file_data)
+    
+    # if ts_form.validate():
+    #     response.flash = 'form accepted'
+    #     print("ts_form.vars._file = " + str(ts_form.vars._file))
 
-    return dict(form=ts_form)
+    # elif ts_form.errors:
+    #     session.file_data = ""
+    #     response.flash = 'form has errors'
+    # else:
+    #     response.flash = 'please fill in form'
+    # return dict(form=ts_form, file_data=session.file_data)
+
 
 def s_plotter():
     
