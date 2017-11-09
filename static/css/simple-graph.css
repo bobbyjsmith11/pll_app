@@ -1,0 +1,83 @@
+body { font: 13px sans-serif; }
+rect { fill: #fff; }
+ul {
+  list-style-type: none;
+  margin: 0.5em 0em 0.5em 0em;
+  width: 100%; }
+  ul li {
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0em;
+    padding: 0em 1em; }
+.axis { font-size: 1.5em; }
+.chart {
+  display: inline-block;
+  background-color: #F7F2C5;
+  width: 960px;
+  height: 500px; }
+circle, .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px; }
+circle {
+  fill: white;
+  fill-opacity: 0.2;
+  cursor: move; }
+  circle.selected {
+    fill: #ff7f0e;
+    stroke: #ff7f0e; }
+  circle:hover {
+    fill: #ff7f0e;
+    stroke: #707f0e; }
+  circle.selected:hover {
+    fill: #ff7f0e;
+    stroke: #ff7f0e; }
+
+
+form {
+  padding: 10px;
+  /* display: inline-block;
+  text-align: center; */
+}
+
+
+/*****************************************
+ *   upload button styles
+ *   ******************************************/
+.file-upload {
+    position: relative;
+    display: inline-block;
+}
+
+.inputfile-label {
+  display: block;
+  padding: 1em 2em;
+  color: #fff;
+  background: #0059B3;
+  border-radius: .4em;
+  transition: background .3s;
+  
+  /* &:hover {
+    cursor: pointer;
+    background: #000;
+  }*/
+}
+
+.inputfile-label:hover {
+  cursor: pointer;
+  background: #003366;
+}
+
+                    
+.inputfile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 1;
+  width:0;
+  height: 100%;
+  opacity: 0;
+}
+
