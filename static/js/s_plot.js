@@ -10,7 +10,6 @@ registerKeyboardHandler = function(callback) {
 function plot() {
   var s = $("#file_data").text();
   s = encodeURIComponent( s );  // needed to escape any JSON special characters like "#"
-  // my_url = "/pll_app/default/load_s2p?"
   my_url = "/pll_app/s_plot/getLogMagnitude?"
   // dat = "file_data='" + s +"'";
   dat = "";
@@ -32,6 +31,7 @@ function plot() {
   // console.log("plot();");
 } 
  
+
 /*
  *
  *
@@ -128,10 +128,7 @@ function plotLogMag( data_dict=null ) {
           .append("svg")
           .attr("preserveAspectRatio", "xMinYMin meet")
           .attr("viewBox", "0 0 700 500")
-          .classed("svg-content-responsive", true)
           .call(zoom);
-          // .attr("transform", "translate(0,0)");
-          // .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
   
     color = d3.scale.category10();
 
@@ -151,7 +148,7 @@ function plotLogMag( data_dict=null ) {
       };
     });
 
-    var legend = graph.selectAll('g')
+    legend = graph.selectAll('g')
       .data(params)
       .enter()
       .append('g')
@@ -233,7 +230,6 @@ function plotLogMag( data_dict=null ) {
       })
       .attr("clip-path", "url(#rect-clip)")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
     
     //
     //  mouse line section

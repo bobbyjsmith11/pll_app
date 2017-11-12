@@ -36,33 +36,37 @@ def pll_designer():
 
 def test_file_upload():
 
-    touchstone_form = FORM(
-                        INPUT(_name='touchstone_file', _type='file'),
-                        INPUT(_name='submitBtn', _type='submit'),
-                            )
-
-    # touchstone_form = FORM(TABLE(TR(TH(INPUT(_name='touchstone_file', _type='file', _class="upload-btn", _value="browse"))),
-    #                             TR(TH(INPUT(_name='submitBtn', _type='submit', _value='upload')))))
-
-    file_data = "upload touchstone file to plot"
-    if touchstone_form.accepts(request, session):
-        file_data = ("request.vars = " + str(request.vars))
-    else:
-        file_data = ("touchstone_form did not accept\nrequest.vars = " + str(request.vars))
-
-    return dict(form=touchstone_form, file_data=file_data)
     
-    # if ts_form.validate():
-    #     response.flash = 'form accepted'
-    #     print("ts_form.vars._file = " + str(ts_form.vars._file))
+    form = FORM(TABLE(TR(TH(INPUT(_name='touchstone_file', _type='file', _class="inputfile-label", _value="browse"))),
+                        TR(TH(INPUT(_name='submitBtn', _class="btn btn-default", _type='submit', _value='upload')))))
+    
+    
+    file_data = "upload touchstone file to plot"
+    if form.validate():
+        response.flash = 'form accepted'
+        file_data = form.vars.touchstone_file
+        filepath = os.path.join(request.folder, 'uploads', form.vars.touchstone_file.filename)
+        file_data = form.vars.touchstone_file.file.read()
+        ftemp = open( filepath, 'wb')
+        ftemp.write( file_data)
+        ftemp.close()
 
-    # elif ts_form.errors:
-    #     session.file_data = ""
-    #     response.flash = 'form has errors'
-    # else:
-    #     response.flash = 'please fill in form'
-    # return dict(form=ts_form, file_data=session.file_data)
+        try:
+            session.network = skrf.Network( filepath )
+            session.file_data = file_data
+        except Exception as e:
+            session.file_data = ""
+            print(e)
+            print("failed creating skrf.Network(" + str(filepath) + ")")
+        os.remove( filepath )
 
+    elif form.errors:
+        session.file_data = ""
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill in form'
+    
+    return dict(form=form, file_data=file_data)
 
 def s_plotter():
     
@@ -71,7 +75,6 @@ def s_plotter():
     form = SQLFORM.factory(db.s_plot_form)
     # session.clear()
     if form.validate():
-        pass 
         response.flash = 'form accepted'
         filepath = os.path.join(request.folder, 'uploads', form.vars.ts_file)
 

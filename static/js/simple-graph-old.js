@@ -27,7 +27,7 @@ registerKeyboardHandler = function(callback) {
   d3.select(window).on("keydown", callback);  
 };
 
-LogMagPlot = function(elemid, options) {
+SimpleGraph = function(elemid, options) {
   var self = this;
   this.chart = document.getElementById(elemid);
   this.cx = this.chart.clientWidth;
@@ -78,7 +78,14 @@ LogMagPlot = function(elemid, options) {
                   .x( function(d) { return x(d.f); } )  
                   .y( function(d) { return y(d.logMag); } );
 
-  this.color = d3.scale.category10();
+  var xrange =  (this.options.xmax - this.options.xmin),
+      yrange2 = (this.options.ymax - this.options.ymin) / 2,
+      yrange4 = yrange2 / 2,
+      datacount = this.size.width/30;
+
+  // this.points = d3.range(datacount).map(function(i) { 
+  //   return { x: i * xrange / datacount, y: this.options.ymin + yrange4 + Math.random() * yrange2 }; 
+  // }, self);
 
   this.vis = d3.select(this.chart).append("svg")
       .attr("width",  this.cx)
@@ -175,10 +182,10 @@ LogMagPlot = function(elemid, options) {
 };
   
 //
-// LogMagPlot methods
+// SimpleGraph methods
 //
 
-LogMagPlot.prototype.plot_drag = function() {
+SimpleGraph.prototype.plot_drag = function() {
   var self = this;
   return function() {
     registerKeyboardHandler(self.keydown());
@@ -202,7 +209,7 @@ LogMagPlot.prototype.plot_drag = function() {
   }
 };
 
-LogMagPlot.prototype.update = function() {
+SimpleGraph.prototype.update = function() {
   var self = this;
   // var lines = this.vis.select("path").attr("d", this.line(this.points));
         
@@ -232,7 +239,7 @@ LogMagPlot.prototype.update = function() {
   }
 }
 
-LogMagPlot.prototype.mousemove = function() {
+SimpleGraph.prototype.mousemove = function() {
   var self = this;
   return function() {
     var p = d3.svg.mouse(self.vis[0][0]),
@@ -277,7 +284,7 @@ LogMagPlot.prototype.mousemove = function() {
   }
 };
 
-LogMagPlot.prototype.mouseup = function() {
+SimpleGraph.prototype.mouseup = function() {
   var self = this;
   return function() {
     document.onselectstart = function() { return true; };
@@ -301,7 +308,7 @@ LogMagPlot.prototype.mouseup = function() {
   }
 }
 
-LogMagPlot.prototype.keydown = function() {
+SimpleGraph.prototype.keydown = function() {
   var self = this;
   return function() {
     if (!self.selected) return;
@@ -319,7 +326,7 @@ LogMagPlot.prototype.keydown = function() {
 };
 
 
-LogMagPlot.prototype.redraw = function() {
+SimpleGraph.prototype.redraw = function() {
   var self = this;
   // console.log("redraw");
 
@@ -373,7 +380,7 @@ LogMagPlot.prototype.redraw = function() {
   }  
 }
 
-LogMagPlot.prototype.xaxis_drag = function() {
+SimpleGraph.prototype.xaxis_drag = function() {
   var self = this;
   return function(d) {
     document.onselectstart = function() { return false; };
@@ -382,7 +389,7 @@ LogMagPlot.prototype.xaxis_drag = function() {
   }
 };
 
-LogMagPlot.prototype.yaxis_drag = function(d) {
+SimpleGraph.prototype.yaxis_drag = function(d) {
   var self = this;
   return function(d) {
     document.onselectstart = function() { return false; };
@@ -391,8 +398,7 @@ LogMagPlot.prototype.yaxis_drag = function(d) {
   }
 };
 
-LogMagPlot.prototype.plot_data = function( data_dict ) {
-
+SimpleGraph.prototype.plot_data = function( data_dict ) {
   var self = this;
   self.data_dict = data_dict;
   self.data = [];
@@ -422,18 +428,18 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
   max_y = math.ceil(max_y/10)*10;
   min_y = math.floor(min_y/10)*10;
 
-  // self.logLine = d3.svg.line()
-  //                   .x( function(d) { return self.x(d.f); } )  
-  //                   .y( function(d) { return self.x(d.logMag); } )
-  //                   .interpolate("linear");
+  self.logLine = d3.svg.line()
+                    .x( function(d) { return self.x(d.f); } )  
+                    .y( function(d) { return self.x(d.logMag); } )
+                    .interpolate("linear");
 
-  // color = d3.scale.category10();
+  color = d3.scale.category10();
 
-  self.color.domain(d3.keys(self.data[0]).filter(function(key) {
+  color.domain(d3.keys(self.data[0]).filter(function(key) {
     return key !== "f" && key !== "number_of_ports";
   }));
 
-  params = self.color.domain().map(function(name) {
+  params = color.domain().map(function(name) {
     return {
       name: name,
       values: self.data.map(function(d) {
@@ -445,23 +451,13 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
     };
   });
 
-  
-  // self.vis
-  //   .append('rect')
-  //   .attr('x', self.padding.left + 5)
-  //   .attr('y', 100)
-  //   .attr('width', 20)
-  //   .attr('height', 20)
-  //   .style('fill', self.color(0));
-
-  self.legend = this.vis.selectAll('g')
+  self.legend = self.plot.selectAll('g')
     .data(params)
     .enter()
     .append('g')
     .attr('class', 'legend');
 
-  self.legend
-    .append('rect')
+  self.legend.append('rect')
     .attr('x', self.padding.left + 5)
     .attr('y', function(d, i) {
       return i * 20 + self.padding.top;
@@ -469,11 +465,10 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
     .attr('width', 10)
     .attr('height', 10)
     .style('fill', function(d) {
-      return self.color(d.name);
+      return color(d.name);
     });
 
-  self.legend
-    .append('text')
+  self.legend.append('text')
     .attr('x', self.padding.left + 20)
     .attr('y', function(d, i) {
       return (i * 20) + self.padding.top + 9;
@@ -481,7 +476,26 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
     .text(function(d) {
       return d.name;
     });
- 
+
+  // self.legend.append('rect')
+  //   .attr('x', self.size.width + self.padding.left + 5)
+  //   .attr('y', function(d, i) {
+  //     return i * 20 + self.padding.top;
+  //   })
+  //   .attr('width', 10)
+  //   .attr('height', 10)
+  //   .style('fill', function(d) {
+  //     return color(d.name);
+  //   });
+
+  // self.legend.append('text')
+  //   .attr('x', self.size.width + self.padding.left + 20)
+  //   .attr('y', function(d, i) {
+  //     return (i * 20) + self.padding.top + 9;
+  //   })
+  //   .text(function(d) {
+  //     return d.name;
+  //   });
 
   // this.vis.append("svg")
   //     .attr("top", 0)
@@ -494,26 +508,26 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
   //         .attr("class", "line")
   //         .attr("d", this.logLine(this.points));
 
-  // param = self.vis.selectAll(".param")
-  //   .data(params)
-  //   .enter().append("g")
-  //   .attr("class", "logMag");
+  param = self.vis.selectAll(".param")
+    .data(params)
+    .enter().append("g")
+    .attr("class", "logMag");
 
-  // param.append("path")
-  //     .attr("top", 0)
-  //     .attr("left", 0)
-  //     .attr("width", this.size.width)
-  //     .attr("height", this.size.height)
-  //     .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
-  //     .attr("class", "line")
-  //     .append("path")
-  //         .attr("class", "line")
-  //         .attr("d", function(d) {
-  //           return self.logLine(d.values);
-  //         })
-  //         .style("stroke", function(d) {
-  //           return color(d.name);
-  //         })
+  param.append("path")
+      .attr("top", 0)
+      .attr("left", 0)
+      .attr("width", this.size.width)
+      .attr("height", this.size.height)
+      .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
+      .attr("class", "line")
+      .append("path")
+          .attr("class", "line")
+          .attr("d", function(d) {
+            return self.logLine(d.values);
+          })
+          .style("stroke", function(d) {
+            return color(d.name);
+          })
 
   // param = self.vis.selectAll(".param")
   //   .data(params)
@@ -523,12 +537,12 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
   // param.append("path")
   //   .attr("class", "line")
   //   .attr("d", function(d) {
-  //     return self.logLine(d.values);
+  //     return logLine(d.values);
   //   })
   //   .style("stroke", function(d) {
   //     return color(d.name);
   //   })
-  //   // .attr("clip-path", "url(#rect-clip)")
+  //   .attr("clip-path", "url(#rect-clip)")
   //   .attr("transform", "translate(" + self.padding.left + "," + self.padding.top + ")");
 
   // param.append("path")
@@ -542,11 +556,9 @@ LogMagPlot.prototype.plot_data = function( data_dict ) {
   //   .attr("clip-path", "url(#rect-clip)")
   //   .attr("transform", "translate(" + self.padding.left + "," + self.padding.top + ")");
 
- 
-  // self.chart.style.display = 'none'; 
-  // self.chart.style.display = 'inline-block'; 
-  
-  // self.redraw();
+
+    // document.getElementById("logMagDiv").style.display = 'none';
+    // document.getElementById("logMagDiv").style.display = 'block';
 };
 
 

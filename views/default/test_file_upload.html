@@ -1,5 +1,4 @@
 {{response.files.append(URL('static','css/simple-graph.css'))}}
-{{response.files.append(URL('static','css/s_plotter.css'))}}
 {{response.files.append(URL('static','js/simple-graph.js'))}}
 {{extend 'layout.html'}}
 <!DOCTYPE html>
@@ -9,23 +8,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>One Graph</title>
-  <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
+  <!-- script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script -->
   <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.js"></script>
 </head>
 <body>
 
 <div class="container-fluid text-center">
-  <div >
-    <h2>Plot Touchstone</h2>
-    <form action="" enctype="multipart/form-data" method="post">
-      <div class="file-upload">
-        <label for="upload" class="inputfile-label">Browse for touchstone file</label>
-        <input id="upload" class="inputfile" type="file" name="file-upload" />
-        <input name="submitBtn" type="submit" value="upload"/>
-      </div>
-    </form>
 
+  <div>
+    <h2>Plot Touchstone</h2>
+    {{=form}}
   </div>
+
   <div >
     <button type="button" id="plotBtn" class="btn btn-default" OnClick="plot()" >plot</button>
   </div>
@@ -43,12 +37,12 @@
   <body>
     <div id="chart1" class="chart"></div>
     <script type="text/javascript">
-      graph = new SimpleGraph("chart1", {
-          "xmax": 60, "xmin": 0,
-          "ymax": 40, "ymin": 0, 
-          "title": "Simple Graph1",
-          "xlabel": "X Axis",
-          "ylabel": "Y Axis"  
+      graph = new LogMagPlot("chart1", {
+          "xmax": 6e9, "xmin": 0,
+          "ymax": 20, "ymin": -50, 
+          "title": "S Parameters",
+          "xlabel": "Frequency",
+          "ylabel": "dB"  
         });
     </script>
   </div>

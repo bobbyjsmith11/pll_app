@@ -44,6 +44,7 @@ def getLogMagnitude( ):
         n = skrf.Network( fname )   # pass in the file you just created
     except Exception as e:
         print(e)
+    print( os.path.abspath(fname) )
     os.remove( fname )          # delete this file
 
     d = { 'f':                  n.f.tolist(),
