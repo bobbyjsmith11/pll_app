@@ -182,6 +182,7 @@ function plotLogMag( data_dict=null ) {
          .attr("width",width)
          .attr("height",height);
 
+
     // Add the y-axis to the left
     graph.append("svg:g")
           .attr("class", "y axis")
@@ -213,7 +214,6 @@ function plotLogMag( data_dict=null ) {
           .attr("text-anchor", "middle")
           .attr("transform", "translate("+ (-margin.left/1.5 + margin.left) +","+ (height/2 + margin.top)+")rotate(-90)")
           .text("(dB)");
-
 
     param = graph.selectAll(".param")
       .data(params)
@@ -329,7 +329,6 @@ function plotLogMag( data_dict=null ) {
     document.getElementById("logMagDiv").style.display = 'block';
 
 };
-
 
 
 function zoomed() {

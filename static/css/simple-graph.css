@@ -13,6 +13,24 @@ path {
       shape-rendering: crispEdges;
     }
 
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
+.chart-title {
+  font-size: 1.5em;
+  /* font-weight: bold; */
+}
+
+.location-text {
+  font-size: 0.7em
+}
 
 rect { fill: #fff; }
 ul {
@@ -48,7 +66,6 @@ circle {
   circle.selected:hover {
     fill: #ff7f0e;
     stroke: #ff7f0e; }
-
 
 form {
   padding: 10px;

@@ -27,7 +27,7 @@ registerKeyboardHandler = function(callback) {
   d3.select(window).on("keydown", callback);  
 };
 
-SimpleGraph = function(elemid, options) {
+LogMagPlot = function(elemid, options) {
   var self = this;
   this.chart = document.getElementById(elemid);
   this.cx = this.chart.clientWidth;
@@ -78,14 +78,7 @@ SimpleGraph = function(elemid, options) {
                   .x( function(d) { return x(d.f); } )  
                   .y( function(d) { return y(d.logMag); } );
 
-  var xrange =  (this.options.xmax - this.options.xmin),
-      yrange2 = (this.options.ymax - this.options.ymin) / 2,
-      yrange4 = yrange2 / 2,
-      datacount = this.size.width/30;
-
-  // this.points = d3.range(datacount).map(function(i) { 
-  //   return { x: i * xrange / datacount, y: this.options.ymin + yrange4 + Math.random() * yrange2 }; 
-  // }, self);
+  this.color = d3.scale.category10();
 
   this.vis = d3.select(this.chart).append("svg")
       .attr("width",  this.cx)
@@ -182,10 +175,10 @@ SimpleGraph = function(elemid, options) {
 };
   
 //
-// SimpleGraph methods
+// LogMagPlot methods
 //
 
-SimpleGraph.prototype.plot_drag = function() {
+LogMagPlot.prototype.plot_drag = function() {
   var self = this;
   return function() {
     registerKeyboardHandler(self.keydown());
@@ -209,7 +202,7 @@ SimpleGraph.prototype.plot_drag = function() {
   }
 };
 
-SimpleGraph.prototype.update = function() {
+LogMagPlot.prototype.update = function() {
   var self = this;
   // var lines = this.vis.select("path").attr("d", this.line(this.points));
         
@@ -239,7 +232,7 @@ SimpleGraph.prototype.update = function() {
   }
 }
 
-SimpleGraph.prototype.mousemove = function() {
+LogMagPlot.prototype.mousemove = function() {
   var self = this;
   return function() {
     var p = d3.svg.mouse(self.vis[0][0]),
@@ -284,7 +277,7 @@ SimpleGraph.prototype.mousemove = function() {
   }
 };
 
-SimpleGraph.prototype.mouseup = function() {
+LogMagPlot.prototype.mouseup = function() {
   var self = this;
   return function() {
     document.onselectstart = function() { return true; };
@@ -308,7 +301,7 @@ SimpleGraph.prototype.mouseup = function() {
   }
 }
 
-SimpleGraph.prototype.keydown = function() {
+LogMagPlot.prototype.keydown = function() {
   var self = this;
   return function() {
     if (!self.selected) return;
@@ -326,7 +319,7 @@ SimpleGraph.prototype.keydown = function() {
 };
 
 
-SimpleGraph.prototype.redraw = function() {
+LogMagPlot.prototype.redraw = function() {
   var self = this;
   // console.log("redraw");
 
@@ -380,7 +373,7 @@ SimpleGraph.prototype.redraw = function() {
   }  
 }
 
-SimpleGraph.prototype.xaxis_drag = function() {
+LogMagPlot.prototype.xaxis_drag = function() {
   var self = this;
   return function(d) {
     document.onselectstart = function() { return false; };
@@ -389,7 +382,7 @@ SimpleGraph.prototype.xaxis_drag = function() {
   }
 };
 
-SimpleGraph.prototype.yaxis_drag = function(d) {
+LogMagPlot.prototype.yaxis_drag = function(d) {
   var self = this;
   return function(d) {
     document.onselectstart = function() { return false; };
@@ -398,7 +391,8 @@ SimpleGraph.prototype.yaxis_drag = function(d) {
   }
 };
 
-SimpleGraph.prototype.plot_data = function( data_dict ) {
+LogMagPlot.prototype.plot_data = function( data_dict ) {
+
   var self = this;
   self.data_dict = data_dict;
   self.data = [];
@@ -428,18 +422,18 @@ SimpleGraph.prototype.plot_data = function( data_dict ) {
   max_y = math.ceil(max_y/10)*10;
   min_y = math.floor(min_y/10)*10;
 
-  self.logLine = d3.svg.line()
-                    .x( function(d) { return self.x(d.f); } )  
-                    .y( function(d) { return self.x(d.logMag); } )
-                    .interpolate("linear");
+  // self.logLine = d3.svg.line()
+  //                   .x( function(d) { return self.x(d.f); } )  
+  //                   .y( function(d) { return self.x(d.logMag); } )
+  //                   .interpolate("linear");
 
-  color = d3.scale.category10();
+  // color = d3.scale.category10();
 
-  color.domain(d3.keys(self.data[0]).filter(function(key) {
+  self.color.domain(d3.keys(self.data[0]).filter(function(key) {
     return key !== "f" && key !== "number_of_ports";
   }));
 
-  params = color.domain().map(function(name) {
+  params = self.color.domain().map(function(name) {
     return {
       name: name,
       values: self.data.map(function(d) {
@@ -451,51 +445,41 @@ SimpleGraph.prototype.plot_data = function( data_dict ) {
     };
   });
 
-  self.legend = self.plot.selectAll('g')
-    .data(params)
-    .enter()
-    .append('g')
-    .attr('class', 'legend');
+  
 
-  self.legend.append('rect')
-    .attr('x', self.padding.left + 5)
-    .attr('y', function(d, i) {
-      return i * 20 + self.padding.top;
-    })
-    .attr('width', 10)
-    .attr('height', 10)
-    .style('fill', function(d) {
-      return color(d.name);
-    });
+  
+  // self.legend = self.vis.selectAll('g')
+  //   .data(params)
+  //   // .enter()
+  //   .append('g')
+  //   .attr('class', 'legend')
+  //   .attr("transform", "translate(0," + (-1*this.size.height) + ")");
+  //   // .attr("transform", "translate(" + (-1*this.size.width) + "," + (-1*this.size.height) + ")");
 
-  self.legend.append('text')
-    .attr('x', self.padding.left + 20)
-    .attr('y', function(d, i) {
-      return (i * 20) + self.padding.top + 9;
-    })
-    .text(function(d) {
-      return d.name;
-    });
-
-  // self.legend.append('rect')
-  //   .attr('x', self.size.width + self.padding.left + 5)
+  // self.legend
+  //   .append('rect')
+  //   .attr('x', self.size.width + 5)
   //   .attr('y', function(d, i) {
-  //     return i * 20 + self.padding.top;
+  //     console.log("x[" + String(i) + "]: " + String(i*20));
+  //     console.log("y[" + String(i) + "]: " + String(i*20));
+  //     return i*20;
   //   })
   //   .attr('width', 10)
   //   .attr('height', 10)
   //   .style('fill', function(d) {
-  //     return color(d.name);
+  //     return self.color(d.name);
   //   });
 
-  // self.legend.append('text')
-  //   .attr('x', self.size.width + self.padding.left + 20)
+  // self.legend
+  //   .append('text')
+  //   .attr('x', self.size.width + 20)
   //   .attr('y', function(d, i) {
-  //     return (i * 20) + self.padding.top + 9;
+  //     return (i * 20) + 9;
   //   })
   //   .text(function(d) {
   //     return d.name;
   //   });
+
 
   // this.vis.append("svg")
   //     .attr("top", 0)
@@ -508,42 +492,42 @@ SimpleGraph.prototype.plot_data = function( data_dict ) {
   //         .attr("class", "line")
   //         .attr("d", this.logLine(this.points));
 
-  param = self.vis.selectAll(".param")
-    .data(params)
-    .enter().append("g")
-    .attr("class", "logMag");
-
-  param.append("path")
-      .attr("top", 0)
-      .attr("left", 0)
-      .attr("width", this.size.width)
-      .attr("height", this.size.height)
-      .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
-      .attr("class", "line")
-      .append("path")
-          .attr("class", "line")
-          .attr("d", function(d) {
-            return self.logLine(d.values);
-          })
-          .style("stroke", function(d) {
-            return color(d.name);
-          })
-
   // param = self.vis.selectAll(".param")
   //   .data(params)
   //   .enter().append("g")
   //   .attr("class", "logMag");
 
   // param.append("path")
-  //   .attr("class", "line")
-  //   .attr("d", function(d) {
-  //     return logLine(d.values);
-  //   })
-  //   .style("stroke", function(d) {
-  //     return color(d.name);
-  //   })
-  //   .attr("clip-path", "url(#rect-clip)")
-  //   .attr("transform", "translate(" + self.padding.left + "," + self.padding.top + ")");
+  //     .attr("top", 0)
+  //     .attr("left", 0)
+  //     .attr("width", this.size.width)
+  //     .attr("height", this.size.height)
+  //     .attr("viewBox", "0 0 "+this.size.width+" "+this.size.height)
+  //     .attr("class", "line")
+  //     .append("path")
+  //         .attr("class", "line")
+  //         .attr("d", function(d) {
+  //           return self.logLine(d.values);
+  //         })
+  //         .style("stroke", function(d) {
+  //           return color(d.name);
+  //         })
+
+  param = self.vis.selectAll(".param")
+    .data(params)
+    .enter().append("g")
+    .attr("class", "logMag");
+
+  param.append("path")
+    .attr("class", "line")
+    .attr("d", function(d) {
+      return self.logLine(d.values);
+    })
+    .style("stroke", function(d) {
+      return color(d.name);
+    })
+    // .attr("clip-path", "url(#rect-clip)")
+    .attr("transform", "translate(" + self.padding.left + "," + self.padding.top + ")");
 
   // param.append("path")
   //   .attr("class", "line")
@@ -556,9 +540,11 @@ SimpleGraph.prototype.plot_data = function( data_dict ) {
   //   .attr("clip-path", "url(#rect-clip)")
   //   .attr("transform", "translate(" + self.padding.left + "," + self.padding.top + ")");
 
-
-    // document.getElementById("logMagDiv").style.display = 'none';
-    // document.getElementById("logMagDiv").style.display = 'block';
+ 
+  // self.chart.style.display = 'none'; 
+  // self.chart.style.display = 'inline-block'; 
+  
+  // self.redraw();
 };
 
 
