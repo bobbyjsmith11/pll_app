@@ -33,9 +33,7 @@
     {{=BEAUTIFY(form.errors)}}
   </div>
 
-  </head>
-  <body>
-    <div id="chart1" class="chart"></div>
+    <div id="chart1" class="chart" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragend="dragend_handler(event);"></div>
     <script type="text/javascript">
       graph = new LogMagPlot("chart1", {
           "xmax": 6e9, "xmin": 0,
@@ -51,5 +49,5 @@
       {{=file_data}}
     </textarea>
   </div>
-  </body>
+</body>
 </html>

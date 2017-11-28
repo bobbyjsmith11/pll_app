@@ -107,12 +107,12 @@ LogMagPlot = function(elemid, options) {
       return this.color(d.name);
     });
 
-  ///   EXPERIMENTAL 
-  this.param = this.vis.selectAll(".param")
-    .data(this.params)
-    .enter().append("g")
-    .attr("class", "logMag");
-  /// 
+  // ///   EXPERIMENTAL 
+  // this.param = this.vis.selectAll(".param")
+  //   .data(this.params)
+  //   .enter().append("g")
+  //   .attr("class", "logMag");
+  // /// 
  
   this.vis.append("text")
     .attr("class", "location-text")
@@ -286,6 +286,8 @@ LogMagPlot.prototype.update_location = function() {
     //   .text("x,y : " + String(p[0]) +" , " + String(p[1]) );
   }
 };
+
+
 LogMagPlot.prototype.redraw = function() {
   var self = this;
   return function() {
@@ -306,15 +308,15 @@ LogMagPlot.prototype.redraw = function() {
     self.vis.select(".x.axis").call(self.xAxis);
     self.vis.select(".y.axis").call(self.yAxis);
 
-    self.param.selectAll("path")
-      .attr("class", "line")
-      .attr("d", function(d) {
-        return self.logLine(d.values);
-      })
-      .style("stroke", function(d) {
-        return self.color(d.name);
-      })
-        .attr("clip-path", "url(#rect-clip)");
+    // self.param.selectAll("path")
+    //   .attr("class", "line")
+    //   .attr("d", function(d) {
+    //     return self.logLine(d.values);
+    //   })
+    //   .style("stroke", function(d) {
+    //     return self.color(d.name);
+    //   })
+    //     .attr("clip-path", "url(#rect-clip)");
     
     // var gx = self.vis.selectAll("g.x")
     //     .data(self.x.ticks(10), String)
@@ -415,6 +417,16 @@ LogMagPlot.prototype.update = function() {
   // console.log("update");
   var self = this;
   
+  self.param.selectAll("path")
+    .attr("class", "line")
+    .attr("d", function(d) {
+      return self.logLine(d.values);
+    })
+    .style("stroke", function(d) {
+      return self.color(d.name);
+    })
+      .attr("clip-path", "url(#rect-clip)");
+
   if (d3.event && d3.event.keyCode) {
     d3.event.preventDefault();
     d3.event.stopPropagation();
@@ -457,7 +469,7 @@ LogMagPlot.prototype.add_plot_lines = function( ) {
     .attr("id", function(d) { return d.name + "-path"; })
     .attr("active", true)
     .attr("class", "data-line")
-    .on("click", self.add_marker() )
+    .on("click", function(d) { self.add_marker()(d); } )
     .on("mouseover", function(d) { d3.select(this).style("stroke-width", "5px");})
     .on("mouseout", function(d) { d3.select(this).style("stroke-width", "3px");})
     .attr("d", function(d) {
@@ -481,21 +493,24 @@ LogMagPlot.prototype.add_plot_lines = function( ) {
     .style('fill', function(d) {
       return self.color(d.name);
     })
-    .on("click", function(d) {
-      var active = self.param.select("#" + d.name + "-path").attr("active");
-      if (active == "true") {
-        active = false
-        self.param.select("#" + d.name + "-rect").style("fill-opacity", "0.1");
-        self.param.select("#" + d.name + "-text").style("fill-opacity", "0.5");
-        self.param.select("#" + d.name + "-path").style("opacity", "0");
-      } else {
-        self.param.select("#" + d.name + "-rect").style("fill-opacity", "1");
-        self.param.select("#" + d.name + "-text").style("fill-opacity", "5");
-        self.param.select("#" + d.name + "-path").style("opacity", "1");
-        active = true 
-      }
-      self.param.select("#" + d.name + "-path").attr("active", active);
-    });
+    .on("mouseover", function(d) { d3.select(this).attr("width", 12).attr("height",12);})
+    .on("mouseout", function(d) { d3.select(this).attr("width", 10).attr("height",10);})
+    .on("click", function(d) { self.toggle_trace()(d) });
+    // .on("click", function(d) {
+    //   var active = self.param.select("#" + d.name + "-path").attr("active");
+    //   if (active == "true") {
+    //     active = false
+    //     self.param.select("#" + d.name + "-rect").style("fill-opacity", "0.1");
+    //     self.param.select("#" + d.name + "-text").style("fill-opacity", "0.5");
+    //     self.param.select("#" + d.name + "-path").style("opacity", "0");
+    //   } else {
+    //     self.param.select("#" + d.name + "-rect").style("fill-opacity", "1");
+    //     self.param.select("#" + d.name + "-text").style("fill-opacity", "5");
+    //     self.param.select("#" + d.name + "-path").style("opacity", "1");
+    //     active = true 
+    //   }
+    //   self.param.select("#" + d.name + "-path").attr("active", active);
+    // });
 
   self.param.append("text")
     .attr("id", function(d) { return d.name + "-text"; })
@@ -603,6 +618,26 @@ LogMagPlot.prototype.add_plot_lines = function( ) {
 
 };
 
+LogMagPlot.prototype.toggle_trace = function( ) {
+  var self = this;
+  return function( d ) {
+    document.onselectstart = function() { return false; };
+    var active = self.param.select("#" + d.name + "-path").attr("active");
+    if (active == "true") {
+      active = false
+      self.param.select("#" + d.name + "-rect").style("fill-opacity", "0.1");
+      self.param.select("#" + d.name + "-text").style("fill-opacity", "0.5");
+      self.param.select("#" + d.name + "-path").style("opacity", "0");
+    } else {
+      self.param.select("#" + d.name + "-rect").style("fill-opacity", "1");
+      self.param.select("#" + d.name + "-text").style("fill-opacity", "5");
+      self.param.select("#" + d.name + "-path").style("opacity", "1");
+      active = true 
+    }
+    self.param.select("#" + d.name + "-path").attr("active", active);
+  };
+};
+
 LogMagPlot.prototype.make_marker_static = function() {
   var self = this;
   return function() {
@@ -616,10 +651,17 @@ LogMagPlot.prototype.make_marker_static = function() {
 
 LogMagPlot.prototype.add_marker = function( ) {
   var self = this;
-  return function() {
-    console.log("you clicked me")
-
-  // line = d3.select(this); // line is an Array, line[0] is a path
+  return function(d) {
+    
+    my_param = self.param.select("#" + d.name + "-path");
+    line = my_param[0][0]; 
+    
+    // self.param = this.vis.selectAll(".param")
+    //   .data(self.params)
+    //   .enter().append("g")
+    //   .attr("class", "logMag");
+  
+    thisLine = d3.select(this); // line is an Array, line[0] is a path
 
   //
   //  mouse line section
@@ -633,7 +675,7 @@ LogMagPlot.prototype.add_marker = function( ) {
       .style("stroke-width", "1px")
       .style("opacity", "0");
       
-    var line = d3.select(this)[0][0];
+    // line = d3.select(this)[0][0];
 
     var mousePerLine = mouseG.selectAll('.mouse-per-line')
       .data(self.params)
@@ -660,7 +702,7 @@ LogMagPlot.prototype.add_marker = function( ) {
       .attr('width', self.size.width) // can't catch mouse events on a g element
       .attr('height', self.size.height)
       .on("click", self.make_marker_static() )
-      .on("keydown", self.change_mode())
+      //.on("keydown", self.change_mode())
       .on('mouseout', function() { // on mouse out hide line, circles and text
         d3.select(".mouse-line")
           .style("opacity", "0");
@@ -713,7 +755,7 @@ LogMagPlot.prototype.add_marker = function( ) {
               .text(self.y.invert(pos.y).toFixed(2));
               
             return "translate(" + mouse[0] + "," + pos.y +")";
-          });
+        });
       });
   
   }
@@ -721,6 +763,7 @@ LogMagPlot.prototype.add_marker = function( ) {
 
 LogMagPlot.prototype.change_mode = function() {
   var self = this;
+  console.log("change_mode");
   return function() {
     console.log("change_mode");
     registerKeyboardHandler(self.keydown());
@@ -767,7 +810,6 @@ LogMagPlot.prototype.reset_scale = function( ) {
   self.y.domain([max_y,min_y]);
   
   self.x.domain([fstart, fstop]);
-  console.log("self.x.domain() = " + String(self.x.domain()));
     
   self.vis.select(".x.axis")
     .transition()
@@ -794,6 +836,7 @@ LogMagPlot.prototype.reset_scale = function( ) {
   self.redraw()();
 };
 
+
 LogMagPlot.prototype.mousemove = function() {
   var self = this;
   return function() {
@@ -807,49 +850,90 @@ LogMagPlot.prototype.mousemove = function() {
     };
     if (!isNaN(self.downx)) {
       d3.select('body').style("cursor", "ew-resize");
-      var rupx = self.x.invert(p[0]),
-          xaxis1 = self.x.domain()[0],
-          xaxis2 = self.x.domain()[1],
-          xextent = xaxis2 - xaxis1;
-      if (rupx != 0) {
-        var changex, new_domain;
-        changex = self.downx / rupx;
-        new_domain = [xaxis1, xaxis1 + (xextent * changex)];
-        self.x.domain(new_domain);
-        self.redraw()();
-      }
+      var rupx = p[0],
+			  // get the limits of the data
+			  // xaxis1 = self.x.invert(self.x.domain()[0]),
+			  xaxis1 = self.x.domain()[0],
+			  xaxis2 = self.x.domain()[1],
+			  changex, new_xdomain, newxmax, delta_x;
+      
+      changex = ( self.downx ) / ( Math.max(1, rupx));
+      newxmax = xaxis1 + (self.xextent * changex);
+      
+      // apply the changes
+      new_xdomain =  [xaxis1, newxmax];
+      self.x.domain(new_xdomain);
+      self.redraw()();
       d3.event.preventDefault();
       d3.event.stopPropagation();
     };
     if (!isNaN(self.downy)) {
       d3.select('body').style("cursor", "ns-resize");
-      var rupy = self.y.invert(p[1]),
+      // get the relative mouse y coordinate
+      var rupy = p[1],
+          // get the limits of the axis
           yaxis1 = self.y.domain()[1],
           yaxis2 = self.y.domain()[0],
-          yextent = yaxis2 - yaxis1;
-          // ymin = self.y.domain()[1]; // experimental
-      if (rupy != 0) {
-        var changey, new_domain, newymax;
-        changey = self.downy / rupy;
+          changey, new_domain, newymax;
+
+      // base the change on the mouse position change, relative
+      // to the height of the plot
+      changey = ( self.size.height - self.downy) / ( Math.max( 1, self.size.height - rupy ) );
         
-        newymax = yaxis1 + (yextent * changey);
-        console.log('rupy = ' + String(rupy) +', p[1] = ' + String(p[1]));
-        console.log('graph.downy = ' + String(self.downy));
-        // console.log('changey = ' + String(changey));
-        // console.log('yaxis1 = ' + String(yaxis1));
-        // console.log('yaxis2 = ' + String(yaxis2));
-        // console.log('yextent = ' + String(yextent));
-        // console.log('newymax = ' + String(newymax));
-        new_domain = [yaxis1 + (yextent * changey), yaxis1];
-        new_domain = [newymax, yaxis1];    // experimental
-        self.y.domain(new_domain);
-        self.redraw()();
-      }
+      // calculate the new max based on:
+      // the original range * the proportional mouse movement
+      newymax = yaxis1 + (self.yextent * changey);
+
+      // apply the changes
+      new_domain = [newymax, yaxis1];
+      self.y.domain(new_domain);
+      self.redraw()();
       d3.event.preventDefault();
       d3.event.stopPropagation();
     }
   }
 };
+
+LogMagPlot.prototype.xaxis_drag = function() {
+  var self = this;
+  return function(d) {
+    // set this flag
+    document.onselectstart = function() { return false; };
+		
+    // get the relative positin in pixels 
+    self.downx = d3.svg.mouse(self.vis[0][0])[0];
+	  
+    // make note of the range at the time of initiating the drag	
+		self.xextent = self.x.domain()[1] - self.x.domain()[0];	
+   	
+  }
+};
+
+LogMagPlot.prototype.yaxis_drag = function(d) {
+  var self = this;
+  return function(d) {
+    // set this flag
+    document.onselectstart = function() { return false; };
+    
+    // get the relative mouse position in pixels
+    self.downy = d3.svg.mouse(self.vis[0][0])[1];
+    
+    // make a note of the range at the time of initiating the drag
+    self.yextent = self.y.domain()[0] - self.y.domain()[1];
+  }
+};
+//   return function(d) {
+//     // console.log("yaxis_drag");
+//     document.onselectstart = function() { return false; };
+//     var p = d3.svg.mouse(self.vis[0][0]);
+//     console.log("p[1] = " + String(p[1]));
+//     // self.downy = self.y.invert(p[1]) - self.y.domain()[1];
+//     self.downy = self.y.invert(p[1]);
+//     console.log("self.downy = " + String(self.downy));
+//   }
+// };
+
+
 
 LogMagPlot.prototype.mouseup = function() {
   var self = this;
@@ -894,30 +978,6 @@ LogMagPlot.prototype.keydown = function() {
   }
 };
 
-LogMagPlot.prototype.xaxis_drag = function() {
-  var self = this;
-  return function(d) {
-    document.onselectstart = function() { return false; };
-    var p = d3.svg.mouse(self.vis[0][0]);
-    console.log("p[0] = " + String(p[0]));
-    self.downx = self.x.invert(p[0]);
-    console.log("self.downx = " + String(self.downx));
-  }
-};
-
-LogMagPlot.prototype.yaxis_drag = function(d) {
-  var self = this;
-  return function(d) {
-    // console.log("yaxis_drag");
-    document.onselectstart = function() { return false; };
-    var p = d3.svg.mouse(self.vis[0][0]);
-    console.log("p[1] = " + String(p[1]));
-    // self.downy = self.y.invert(p[1]) - self.y.domain()[1];
-    self.downy = self.y.invert(p[1]);
-    console.log("self.downy = " + String(self.downy));
-  }
-};
-
 
 function plot() {
   my_url = "/pll_app/s_plot/getLogMagnitude?"
@@ -941,4 +1001,54 @@ function plot() {
   });
   // console.log("plot();");
 };
+
+
+/* Handles the dropping file on chart
+ */
+function drop_handler(ev) {
+  console.lod("drop");
+  ev.preventDefault();
+  ev.stopPropagation();
+  // if dropped items aren't file, reject them
+  // var dt = ev.dataTranser();
+  // if (dt.items) {
+  //   // use DataTransferItemList to access the file(s)
+  //   for (var i=0; dt.items.length; i++) {
+  //     if (dt.items[i].kind == "file") {
+  //       var f = dt.items[i].getAsFile();
+  //       console.log("... file[" + i + "].name = " + f.name );
+  //     }
+  //   }
+  // } else {
+  //   for (var i=0; dt.items.length; i++) {
+  //   console.log("... file[" + i + "].name = " + f.name );
+  //   }
+  // }
+};
+
+
+function dragover_handler(ev) {
+  console.log("dragOver");
+  ev.preventDefault();
+};
+
+
+function dragend_handler(ev) {
+  console.log("dragEnd");
+  // Remove all of the drag data
+  var dt = ev.dataTransfer;
+  if (dt.items) {
+    // use DataTransferItemList interface to remove the drag data
+    for (var i = 0; i < dt.items.length; i++) {
+      dt.items.remove(i);
+    }
+  } else {
+    // use DataTransfer interface to remove the drag data
+    ev.dataTransfer.clearData();
+  }
+};
+
+
+
+
 
