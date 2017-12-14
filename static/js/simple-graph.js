@@ -16,7 +16,7 @@ $(document).on("keydown", function (e) {
 });
 
 registerKeyboardHandler = function(callback) {
-  // console.log("keydown");
+  console.log("keydown");
   var callback = callback;
   d3.select(window).on("keydown", callback);  
 };
@@ -641,9 +641,22 @@ LogMagPlot.prototype.toggle_trace = function( ) {
 LogMagPlot.prototype.make_marker_static = function() {
   var self = this;
   return function() {
+    // console.log(d3.event.keyCode);
     console.log("you clicked after adding marker");
+    mything = d3.select("mouse-over-effects");
+    d3.select(this).attr("pointer-events", "none");
+    // if (!self.selected) return;
+    // switch (d3.event.keyCode) {
+    //   case 8: // backspace
+    //   case 46: { // delete
+    //     // var i = self.points.indexOf(self.selected);
+    //     // self.points.splice(i, 1);
+    //     // self.selected = self.points.length ? self.points[i > 0 ? i - 1 : 0] : null;
+    //     // self.update();
+    //     // break;
+    //   }
+    // }
 
-    d3.select(this).style("pointer-events", "none");
 
   };
 };
@@ -701,8 +714,9 @@ LogMagPlot.prototype.add_marker = function( ) {
       .attr("y", 0)
       .attr('width', self.size.width) // can't catch mouse events on a g element
       .attr('height', self.size.height)
+      // .on("keydown", self.make_marker_static() )
       .on("click", self.make_marker_static() )
-      //.on("keydown", self.change_mode())
+      // .on("keydown", self.change_mode())
       .on('mouseout', function() { // on mouse out hide line, circles and text
         d3.select(".mouse-line")
           .style("opacity", "0");
@@ -753,6 +767,7 @@ LogMagPlot.prototype.add_marker = function( ) {
             
             d3.select(this).select('text')
               .text(self.y.invert(pos.y).toFixed(2));
+              // .text(d3.format(".3s")(self.x.invert(pos.x)) + "," + self.y.invert(pos.y).toFixed(2));
               
             return "translate(" + mouse[0] + "," + pos.y +")";
         });
@@ -966,14 +981,21 @@ LogMagPlot.prototype.keydown = function() {
   return function() {
     if (!self.selected) return;
     switch (d3.event.keyCode) {
-      case 8: // backspace
+      case 8: {// backspace
+        console.log("backspace");
+      }
       case 46: { // delete
+        console.log("delete");
+      }
+      // case 36: {// home
+      //   // console.log("home");
+      //   self.reset_scale();
+      // }
         // var i = self.points.indexOf(self.selected);
         // self.points.splice(i, 1);
         // self.selected = self.points.length ? self.points[i > 0 ? i - 1 : 0] : null;
         // self.update();
         // break;
-      }
     }
   }
 };
